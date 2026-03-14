@@ -1,0 +1,40 @@
+{
+  "name": "opencode-auto-research",
+  "version": "0.1.0",
+  "description": "Governed autonomous experiment loop with a local innovation brain.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:smoke": "tsx scripts/e2e/smoke.ts",
+    "scientific:smoke": "tsx scripts/docker/scientific-task-smoke.ts",
+    "scientific:smoke:python-controller-real-dvc": "tsx scripts/docker/python-controller-real-dvc-smoke.ts",
+    "scientific:smoke:rocm-live-kimi": "tsx scripts/docker/rocm-live-kimi-training-smoke.ts",
+    "docker:test": "tsx scripts/docker/docker-test.ts",
+    "docker:test:opencode": "tsx scripts/docker/docker-opencode-test.ts",
+    "docker:test:scientific": "tsx scripts/docker/docker-scientific-test.ts",
+    "docker:test:scientific:python-controller-real-dvc": "tsx scripts/docker/docker-python-controller-real-dvc-test.ts"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.1.27",
+    "zod": "^4.1.8"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
