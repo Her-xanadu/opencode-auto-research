@@ -1,0 +1,23 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "Sisyphus (Ultraworker)": {
+      "model": "kimi-for-coding/kimi-k2.5"
+    },
+    "Prometheus (Plan Builder)": {
+      "model": "kimi-for-coding/kimi-k2.5"
+    },
+    "sisyphus-junior": {
+      "model": "kimi-for-coding/kimi-k2.5"
+    },
+    "Apollo": {
+      "model": "kimi-for-coding/kimi-k2.5"
+    },
+    "Athena": {
+      "model": "kimi-for-coding/kimi-k2.5"
+    },
+    "Hermes": {
+      "model": "kimi-for-coding/kimi-k2.5"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - /workspace/node_modules
+    environment:
+      CI: "true"
+    command: npm test
+  opencode-kimi:
+    build:
+      context: .
+      dockerfile: Dockerfile.opencode
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - /workspace/node_modules
+    environment:
+      CI: "true"
+      ENABLE_LOCAL_OH_MY_OPENCODE: "1"
+      KIMI_CODING_API_KEY: ${KIMI_CODING_API_KEY:-}
+      KIMI_CODING_BASE_URL: ${KIMI_CODING_BASE_URL:-}
+    command: bash /workspace/scripts/docker/run-opencode-kimi-smoke.sh

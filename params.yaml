@@ -1,0 +1,6 @@
+experiment:
+  target_metric: surrogate_validation_accuracy
+  metric_direction: maximize
+  max_rounds: 3
+  max_full_runs: 3
+  max_hours: 1

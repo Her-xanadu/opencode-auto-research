@@ -1,0 +1,32 @@
+workspace_root: ..
+goal_text: Optimize surrogate_validation_accuracy with the fixed Sisyphus experiment loop.
+target_metric: surrogate_validation_accuracy
+metric_direction: maximize
+target_threshold: 0.9
+min_gain: 0.01
+max_rounds: 3
+max_hours: 1
+budget:
+  max_rounds: 3
+  max_full_runs: 3
+  max_hours: 1
+editable_paths:
+  - src/**
+read_only_paths:
+  - data/**
+eval_command: python3 evaluate.py --stage baseline
+metric_extract_rule: number
+commands:
+  baseline: python3 evaluate.py --stage baseline
+  smoke: python3 evaluate.py --stage smoke
+  proxy: python3 evaluate.py --stage proxy
+  full: python3 evaluate.py --stage full
+paths:
+  metrics_file: experiments/metrics.json
+  metric_key: score
+  editable_paths:
+    - src/**
+innovation:
+  reject_parameter_only: true
+  max_family_failures: 2
+  cooldown_rounds: 2

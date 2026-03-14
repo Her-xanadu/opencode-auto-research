@@ -1,0 +1,13 @@
+stages:
+  full:
+    cmd: python3 evaluate.py --stage full
+    deps:
+      - evaluate.py
+      - src/config.json
+      - src/strategy.txt
+      - src/module.ts
+    metrics:
+      - experiments/metrics.json
+    outs:
+      - dvclive
+      - experiments/checkpoints
