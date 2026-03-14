@@ -1,0 +1,15 @@
+{
+  "workspace_root": "/tmp/workspace",
+  "editable_paths": ["src/**"],
+  "read_only_paths": ["data/**"],
+  "eval_command": "python3 -c 'print(0.91)'",
+  "eval_parser": "number",
+  "primary_metric": "accuracy",
+  "metric_direction": "maximize",
+  "max_iterations": 3,
+  "max_hours": 1,
+  "stop_rule": {
+    "metric_threshold": 0.99,
+    "max_no_improvement_rounds": 2
+  }
+}

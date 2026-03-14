@@ -1,0 +1,17 @@
+{
+  "run_id": "run-good",
+  "baseline_metric": 0.82,
+  "current_metric": 0.9,
+  "best_metric": 0.9,
+  "metric_delta": 0.08,
+  "change_class": "hyperparameter",
+  "change_unit": "learning_rate",
+  "change_manifest": {
+    "primary_object": "learning_rate",
+    "secondary_objects": []
+  },
+  "monitor_summary": {
+    "state": "completed"
+  },
+  "decision_status": "keep"
+}

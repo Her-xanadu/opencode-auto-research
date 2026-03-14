@@ -1,0 +1,14 @@
+{
+  "round": 2,
+  "proposal_family": "repr.feature",
+  "decision": "discard",
+  "metric_gain": -0.03,
+  "repo_fit": "medium",
+  "failure_mode": "poor-transfer",
+  "note": "grounded discard",
+  "evidence_pack_path": "experiments/research/evidence-round-0002.md",
+  "paper_grounding": [
+    {"paper_id": "paper:sok-2024:a1b2c3d4e5"},
+    {"paper_id": "paper:arxiv:2024:ffffeeee11"}
+  ]
+}

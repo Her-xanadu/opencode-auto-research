@@ -1,0 +1,5 @@
+{
+  "run_id": "run-crash",
+  "checkpoint_path": "checkpoints/latest.ckpt",
+  "parent_run_id": "run-parent"
+}

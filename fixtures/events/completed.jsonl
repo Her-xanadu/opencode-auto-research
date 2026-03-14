@@ -1,0 +1,3 @@
+{"type":"run_started","run_id":"run-1","timestamp":"2026-01-01T00:00:00.000Z","payload":{}}
+{"type":"metric_reported","run_id":"run-1","timestamp":"2026-01-01T00:00:05.000Z","payload":{"metric":0.9}}
+{"type":"run_completed","run_id":"run-1","timestamp":"2026-01-01T00:00:10.000Z","payload":{}}

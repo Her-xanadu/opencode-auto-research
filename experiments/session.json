@@ -1,0 +1,21 @@
+{
+  "loop_id": "loop-skeleton",
+  "round": 0,
+  "state": "idle",
+  "stage": "idle",
+  "message": "skeleton session",
+  "active_dvc_task": null,
+  "active_run_id": null,
+  "best_metric": null,
+  "best_exp_ref": null,
+  "best_run_id": null,
+  "family_cooldowns": {},
+  "family_failures": {},
+  "budget_used": {
+    "rounds": 0,
+    "full_runs": 0
+  },
+  "stop_reason": null,
+  "iteration_count": 0,
+  "updated_at": "1970-01-01T00:00:00Z"
+}

@@ -1,0 +1,9 @@
+target_metric: accuracy
+metric_direction: maximize
+target_threshold: 0.92
+max_rounds: 3
+max_hours: 1
+editable_paths:
+  - src/**
+eval_command: "python3 -c 'print(0.91)'"
+metric_extract_rule: number

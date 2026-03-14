@@ -1,0 +1,14 @@
+{
+  "round": 1,
+  "proposal_family": "objective.loss",
+  "decision": "keep",
+  "metric_gain": 0.12,
+  "repo_fit": "high",
+  "failure_mode": null,
+  "note": "grounded keep",
+  "evidence_pack_path": "experiments/research/evidence-round-0001.md",
+  "paper_grounding": [
+    {"paper_id": "doi:10.1145/3718958.3750493"},
+    {"paper_id": "doi:10.1145/3711896.3736964"}
+  ]
+}

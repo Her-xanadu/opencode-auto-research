@@ -1,0 +1,5 @@
+{
+  "goal_text": "Optimize encrypted traffic anomaly detection under drift with grounded experiment changes.",
+  "target_metric": "surrogate_validation_accuracy",
+  "metric_direction": "maximize"
+}

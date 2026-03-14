@@ -1,0 +1,3 @@
+{"type":"run_started","run_id":"run-1","timestamp":"2026-01-01T00:00:00.000Z","payload":{}}
+{"type":"checkpoint_saved","run_id":"run-1","timestamp":"2026-01-01T00:00:05.000Z","payload":{"path":"ckpt.pt"}}
+{"type":"run_failed","run_id":"run-1","timestamp":"2026-01-01T00:00:10.000Z","payload":{"reason":"oom"}}

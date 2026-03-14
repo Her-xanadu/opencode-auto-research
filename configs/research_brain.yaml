@@ -1,0 +1,15 @@
+vault_root: ../vault
+index_output_dir: experiments/research/index
+retrieval_cache_dir: experiments/research/retrieval-cache
+evidence_output_dir: experiments/research
+feedback_output: experiments/research/paper-feedback.jsonl
+posterior_rank_output: experiments/research/posterior-rank.json
+paper_id_map_output: experiments/research/paper-id-map.jsonl
+frontier_map_output: experiments/research/index/frontier-map.json
+selection:
+  relevant_count: 2
+  orthogonal_count: 1
+  cautionary_count: 1
+  minimum_evidence_units: 2
+  max_papers_for_prompt: 4
+  max_claims_per_paper: 2
