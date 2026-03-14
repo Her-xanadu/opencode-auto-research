@@ -31,22 +31,32 @@ It is designed for research workflows where you want one outer orchestrator to:
 
 ## Architecture
 
-```text
-goal + state + research brain
-        |
-        v
-   Sisyphus orchestrator
-        |
-        +--> Apollo  (exploit route)
-        +--> Hermes  (orthogonal route)
-        +--> Athena  (guard + redirect)
-        |
-        v
-  chosen proposal -> sisyphus-junior -> controller -> judge -> feedback
-        ^                                                  |
-        |                                                  v
-        +---------------- research brain updates <---------+
+```mermaid
+flowchart TD
+    A[Goal config + session state] --> B[Sisyphus orchestrator]
+    C[Research brain index + evidence pack] --> B
+    B --> D[Apollo exploit proposal]
+    B --> E[Hermes orthogonal proposal]
+    B --> F[Athena guard + redirect]
+    D --> G[Primary hypothesis selection]
+    E --> G
+    F --> G
+    G --> H[sisyphus-junior execution]
+    H --> I[Python controller]
+    I --> J[Judge + keep/discard]
+    J --> K[Feedback + direction memory]
+    K --> C
+    K --> B
 ```
+
+### High-level control flow
+
+1. `Sisyphus` reads the goal, session state, and research context.
+2. `Apollo`, `Hermes`, and `Athena` produce grounded proposal signals.
+3. One primary hypothesis is selected.
+4. `sisyphus-junior` is the only agent allowed to change code.
+5. The Python controller executes and judges the round.
+6. Research-brain feedback and direction memory are updated for the next round.
 
 ## Repository Layout
 
