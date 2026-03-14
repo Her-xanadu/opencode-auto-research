@@ -5,13 +5,13 @@
 Recommended local layout:
 
 ```text
-~/Desktop/opencode auto research/
+~/workspace/opencode-auto-research/
 ├── opencode-auto-research/
-└── vault -> ~/Desktop/加密流量
+└── vault/
 ```
 
 `opencode-auto-research/` is the engineering repository.
-`vault/` is your local Obsidian-compatible paper vault.
+`vault/` is your local Obsidian-compatible paper vault. It can be a normal folder or a symlink.
 
 ## 2. Environment Setup
 

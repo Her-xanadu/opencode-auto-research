@@ -69,12 +69,12 @@ opencode-auto-research/
 
 ## Research Brain Workspace
 
-This repository is packaged to work inside the Desktop workspace:
+One convenient local layout is:
 
 ```text
-~/Desktop/opencode auto research/
+~/workspace/opencode-auto-research/
 ├── opencode-auto-research/     # this repository
-└── vault -> ~/Desktop/加密流量  # local paper vault symlink
+└── vault/                      # local paper vault or symlink
 ```
 
 The default `configs/research_brain.yaml` points to `../vault`, so the engineering repo stays publishable while the paper vault remains local.
@@ -217,6 +217,7 @@ npm test -- tests/e2e/research-brain-direction-memory.test.ts
 - Do not commit your full private paper vault unless you explicitly intend to publish it.
 - Review `configs/research_brain.yaml` before publishing if your local vault path differs.
 - Review `experiments/` and exclude transient artifacts you do not want in source control.
+- For a public release, add `CONTRIBUTING.md` and `SECURITY.md` to clarify collaboration and disclosure expectations.
 
 ## What Is Already Verified
 
@@ -232,3 +233,5 @@ The packaged engineering version currently passes:
 - `GUIDE.md` — full environment and operator guide
 - `AGENTS.md` — project routing rules
 - `configs/research_brain.yaml` — research-brain maintenance configuration
+- `CONTRIBUTING.md` — contribution expectations
+- `SECURITY.md` — safe disclosure and publishing guidance

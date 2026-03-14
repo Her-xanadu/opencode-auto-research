@@ -75,7 +75,7 @@ def load_research_config(config_path: Optional[pathlib.Path] = None) -> Dict[str
     default_path = SCRIPTS_ROOT.parent / "configs" / "research_brain.yaml"
     path = config_path or default_path
     config = load_yaml_like(path) if path.exists() else {}
-    config.setdefault("vault_root", "/Users/herxanadu/Desktop/加密流量")
+    config.setdefault("vault_root", "../vault")
     vault_root = pathlib.Path(str(config.get("vault_root") or ""))
     if vault_root and not vault_root.is_absolute():
         config["vault_root"] = str((path.parent / vault_root).resolve())
