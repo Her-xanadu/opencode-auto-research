@@ -50,6 +50,7 @@ describe("agent orchestration prompts", () => {
           expect(agent.prompt).toContain("under target");
           expect(agent.prompt).toContain("failure_signature");
           expect(agent.prompt).toContain("causal_metric_path");
+          expect(agent.prompt).toContain("candidate proposal");
         } else {
           expect(agent.prompt).toContain("paper_grounding");
           expect(agent.prompt).toContain("innovation_brief");
@@ -58,6 +59,7 @@ describe("agent orchestration prompts", () => {
           expect(agent.prompt).toContain("causal_metric_path");
           expect(agent.prompt).toContain("failure_signature");
           expect(agent.prompt).toContain("pivot_after_failure");
+          expect(agent.prompt).toContain("Return one");
         }
       }
     }
