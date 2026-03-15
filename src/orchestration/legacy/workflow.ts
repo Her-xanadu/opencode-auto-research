@@ -1,16 +1,16 @@
 import { z } from "zod";
-import type { PluginInput, ToolContext } from "../opencode-plugin";
-import type { ProposalCard } from "../analysis/proposal-card";
-import { runTriModelAnalysis } from "../analysis/tri-model";
-import { buildSession, loadSession, saveSession } from "../experiment/session";
-import { executeIteration, type IterationResult } from "../loop/execute-iteration";
-import { decideIteration } from "../loop/decider";
-import { loadMonitorSummary, type MonitorSummary } from "../monitor/controller";
-import { SpecialistInvocationError, runSpecialistSession, type SpecialistAgentName } from "./specialist-runner";
-import { resumeExperiment } from "../recovery/resume";
-import type { ExperimentSpec } from "../spec/schema";
-import { appendJsonl, readJson, readJsonl, writeJson } from "../utils/fs";
-import { createId } from "../utils/ids";
+import type { PluginInput, ToolContext } from "../../opencode-plugin";
+import { proposalCardSchema, type ProposalCard } from "../../analysis/proposal-card";
+import { runTriModelAnalysis } from "../../analysis/tri-model";
+import { buildSession, loadSession, saveSession } from "../../experiment/session";
+import { executeIteration, type IterationResult } from "../../loop/execute-iteration";
+import { decideIteration } from "../../loop/decider";
+import { loadMonitorSummary, type MonitorSummary } from "../../monitor/controller";
+import { SpecialistInvocationError, runSpecialistSession, type SpecialistAgentName } from "../specialist-runner";
+import { resumeExperiment } from "../../recovery/resume";
+import type { ExperimentSpec } from "../../spec/schema";
+import { appendJsonl, readJson, readJsonl, writeJson } from "../../utils/fs";
+import { createId } from "../../utils/ids";
 import {
   getBestPath,
   getOrchestrationSummaryPath,
@@ -18,9 +18,9 @@ import {
   getRunEventsPath,
   getRunsPath,
   getWorkspaceConfigPath,
-} from "../utils/paths";
-import { nowIso } from "../utils/time";
-import { PROMETHEUS_PLANNER_AGENT, SISYPHUS_JUNIOR_AGENT, SISYPHUS_ORCHESTRATOR_AGENT } from "../agents";
+} from "../../utils/paths";
+import { nowIso } from "../../utils/time";
+import { PROMETHEUS_PLANNER_AGENT, SISYPHUS_JUNIOR_AGENT, SISYPHUS_ORCHESTRATOR_AGENT } from "../../agents";
 
 const orchestrationStepSchema = z.object({
   step_id: z.string(),
@@ -219,11 +219,14 @@ function parseSpecialistJson<T>(schema: z.ZodSchema<T>, text: string): T {
 }
 
 function toProposalCard(input: ProposalCandidate, modelFamily: ProposalCard["model_family"], role: string): ProposalCard {
-  return {
+  return proposalCardSchema.parse({
     proposal_id: createId("proposal"),
     model_family: modelFamily,
     role,
+    family: input.change_class,
     mechanism: input.mechanism,
+    paper_grounding: [],
+    causal_metric_path: [],
     change_surface: input.change_class,
     change_unit: input.change_unit,
     target_metric: "primary_metric",
@@ -233,7 +236,7 @@ function toProposalCard(input: ProposalCandidate, modelFamily: ProposalCard["mod
     single_change_ok: true,
     abstain_reason: null,
     veto: false,
-  };
+  });
 }
 
 function buildMutationRequestFromProposal(proposal: ProposalCandidate): MutationRequest {
@@ -911,11 +914,14 @@ async function runSingleGovernedIteration(input: {
 
   const exploitCard = toProposalCard(normalizedExploit, "gpt", "exploit");
   const divergenceCard = toProposalCard(normalizedDivergence, "gemini", "divergence");
-  const guardCard: ProposalCard = {
+  const guardCard: ProposalCard = proposalCardSchema.parse({
     proposal_id: createId("proposal"),
     model_family: "claude",
     role: "validity_guard",
+    family: normalizedExploit.change_class,
     mechanism: guard.response.verdict === "approve" ? "approved proposal" : "vetoed proposal",
+    paper_grounding: [],
+    causal_metric_path: [],
     change_surface: normalizedExploit.change_class,
     change_unit: normalizedExploit.change_unit,
     target_metric: "primary_metric",
@@ -925,7 +931,7 @@ async function runSingleGovernedIteration(input: {
     single_change_ok: guard.response.single_change_ok,
     abstain_reason: null,
     veto: guard.response.verdict === "veto",
-  };
+  });
   const resolved = resolveProposalSet([exploitCard, guardCard, divergenceCard]);
 
   const steps: OrchestrationStep[] = [
@@ -1093,7 +1099,7 @@ async function runSingleGovernedIteration(input: {
   };
 }
 
-export async function runGovernedExperimentWorkflow(input: {
+export async function runLegacyGovernedExperimentWorkflow(input: {
   workspaceRoot: string;
   spec: ExperimentSpec;
   runtime?: PluginInput;
@@ -1256,3 +1262,5 @@ export async function runGovernedExperimentWorkflow(input: {
 
   return summary;
 }
+
+export const runGovernedExperimentWorkflow = runLegacyGovernedExperimentWorkflow;

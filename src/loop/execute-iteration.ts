@@ -114,7 +114,10 @@ export async function executeIteration(input: {
     baseline_metric: baselineMetric,
     current_metric: currentMetric,
     status: decision.status,
-    next_primary_change: aggregate.next_primary_change?.change_unit ?? null,
+    next_primary_change:
+      typeof aggregate.next_primary_change?.change_unit === "string"
+        ? aggregate.next_primary_change.change_unit
+        : null,
     change_class: input.mutation.change_class,
     change_unit: input.mutation.change_unit,
     touched_files: mutationResult.touched_files,

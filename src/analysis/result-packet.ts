@@ -1,4 +1,5 @@
 import { z } from "zod";
+export { controllerResearchContextSchema, controllerSessionSchema } from "../controller/schema";
 
 export const resultPacketSchema = z.object({
   run_id: z.string(),

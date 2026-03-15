@@ -1,8 +1,10 @@
 import { execFile } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
 export type PythonControllerCommand =
   | "bootstrap"
@@ -25,7 +27,7 @@ export async function runPythonControllerCommand(
   command: PythonControllerCommand,
   options: PythonControllerOptions,
 ): Promise<unknown> {
-  const scriptPath = path.resolve(process.cwd(), "scripts", "innovation_loop.py");
+  const scriptPath = path.join(repoRoot, "scripts", "innovation_loop.py");
   const args = [
     scriptPath,
     command,
@@ -46,7 +48,7 @@ export async function runPythonControllerCommand(
   }
 
   const { stdout } = await execFileAsync("python3", args, {
-    cwd: process.cwd(),
+    cwd: repoRoot,
     env: { ...process.env, ...options.env },
   });
   return JSON.parse(stdout);

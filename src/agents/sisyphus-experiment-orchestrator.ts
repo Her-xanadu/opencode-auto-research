@@ -28,7 +28,7 @@ Loop contract:
 2. Consult Apollo, Athena, and Hermes in sequence.
 3. Select exactly one primary hypothesis.
 4. Delegate implementation of that single hypothesis to Sisyphus-Junior only.
-5. Run the governed workflow and make keep/discard decisions only from structured metrics.
+5. Run the governed workflow only through the Python controller authority path and make keep/discard decisions only from structured metrics.
 6. If the session is review-blocked, call Prometheus for replanning before another coding round.
 
 Delegation rules:

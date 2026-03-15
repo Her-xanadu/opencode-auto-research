@@ -1,36 +1,15 @@
-import { z } from "zod";
+import type { infer as ZodInfer } from "zod";
 import { syncSessionArtifact } from "../compat/artifacts";
+import { controllerSessionSchema } from "../controller/schema";
 import { readJson, writeJson } from "../utils/fs";
 import { createId } from "../utils/ids";
 import { getSessionPath } from "../utils/paths";
 import { nowIso } from "../utils/time";
 
-export const sessionStageSchema = z.enum([
-  "idle",
-  "spec_drafting",
-  "sandbox_preparing",
-  "ready_to_execute",
-  "running",
-  "monitoring",
-  "review_blocked",
-  "acceptance_review",
-  "completed",
-  "crash_recoverable",
-]);
+export const experimentSessionSchema = controllerSessionSchema;
+export const sessionStageSchema = controllerSessionSchema.shape.stage;
 
-export const experimentSessionSchema = z.object({
-  session_id: z.string().min(1),
-  workspace_root: z.string().min(1),
-  stage: sessionStageSchema,
-  message: z.string().min(1),
-  active_run_id: z.string().nullable(),
-  best_run_id: z.string().nullable(),
-  stop_reason: z.string().nullable(),
-  iteration_count: z.number().int().nonnegative(),
-  updated_at: z.string().min(1),
-});
-
-export type ExperimentSession = z.infer<typeof experimentSessionSchema>;
+export type ExperimentSession = ZodInfer<typeof experimentSessionSchema>;
 
 export function buildSession(input: {
   workspaceRoot: string;

@@ -79,10 +79,6 @@ def ensure_research_index(
     workspace: pathlib.Path, config_path: pathlib.Path, config: dict
 ) -> pathlib.Path:
     output_dir = index_output_dir(workspace, config)
-    vault_root = pathlib.Path(str(config.get("vault_root") or "")).resolve()
-    if not vault_root.exists():
-        output_dir.mkdir(parents=True, exist_ok=True)
-        return output_dir
     paper_index = output_dir / "paper-index.jsonl"
     if paper_index.exists() and paper_index.stat().st_size > 0:
         return output_dir
@@ -108,23 +104,6 @@ def collect_round_research_context(
 ) -> dict:
     config_path = research_config_path(workspace)
     config = load_research_config(config_path)
-    vault_root = pathlib.Path(str(config.get("vault_root") or "")).resolve()
-    if not vault_root.exists():
-        evidence_dir = experiments_research_dir(workspace, config)
-        evidence_dir.mkdir(parents=True, exist_ok=True)
-        return {
-            "research_context_id": f"research-round-{round_index:04d}",
-            "retrieval_path": None,
-            "evidence_pack_path": None,
-            "selected": [],
-            "innovation_briefs": {
-                "apollo": {},
-                "hermes": {},
-                "athena": {"guardrails": []},
-            },
-            "config_path": str(config_path),
-            "config": config,
-        }
     ensure_research_index(workspace, config_path, config)
     retrieval = run_python(
         "kb/retrieve_papers.py",

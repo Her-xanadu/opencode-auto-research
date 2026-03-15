@@ -481,6 +481,7 @@ def update_redirect_memory(
     status: str,
     redirect: Optional[str],
     failure_signature: Optional[str] = None,
+    causal_metric_path: Optional[Any] = None,
 ) -> Dict[str, Any]:
     memory = dict(session.get("redirect_memory", {}))
     direction_memory = dict(session.get("direction_memory", {}))
@@ -503,6 +504,24 @@ def update_redirect_memory(
         ):
             return "objective.loss"
         return None
+
+    def metric_path_signature(value: Any) -> str:
+        if isinstance(value, list):
+            return (
+                "->".join(str(item).strip() for item in value if str(item).strip())
+                or "generic-path"
+            )
+        if isinstance(value, str):
+            return value.strip() or "generic-path"
+        return "generic-path"
+
+    def metric_path_match_bonus(stored: str, current: str) -> float:
+        if stored == current:
+            return 1.0
+        stored_parts = [part for part in stored.split("->") if part]
+        current_parts = [part for part in current.split("->") if part]
+        overlap = len(set(stored_parts) & set(current_parts))
+        return 0.2 * overlap
 
     if not family:
         session["redirect_memory"] = memory
@@ -547,7 +566,8 @@ def update_redirect_memory(
                 "updated_at": now_iso(),
             }
             failure_key = str(failure_signature or "generic-underperform")
-            edge_key = f"{family}|{failure_key}"
+            path_key = metric_path_signature(causal_metric_path)
+            edge_key = f"{family}|{failure_key}|{path_key}"
             weight_step = 1.5 if status == "crash" else 1.0
             bucket_v2 = dict(direction_memory_v2.get(edge_key, {}))
             existing = dict(bucket_v2.get(next_family, {}))
@@ -563,6 +583,7 @@ def update_redirect_memory(
                 "weight": round(float(existing.get("weight", 0.0)) + weight_step, 2),
                 "last_round": int(session.get("iteration_count", 0)) + 1,
                 "reason": str(redirect),
+                "metric_path_signature": path_key,
                 "success_count": success_count,
                 "failure_count": failure_count,
                 "crash_count": crash_count,
@@ -1048,6 +1069,24 @@ def select_candidate_mutation(
             return "objective.loss"
         return None
 
+    def metric_path_signature(value: Any) -> str:
+        if isinstance(value, list):
+            return (
+                "->".join(str(item).strip() for item in value if str(item).strip())
+                or "generic-path"
+            )
+        if isinstance(value, str):
+            return value.strip() or "generic-path"
+        return "generic-path"
+
+    def metric_path_match_bonus(stored: str, current: str) -> float:
+        if stored == current:
+            return 1.0
+        stored_parts = [part for part in stored.split("->") if part]
+        current_parts = [part for part in current.split("->") if part]
+        overlap = len(set(stored_parts) & set(current_parts))
+        return 0.2 * overlap
+
     session = load_session(session_path(workspace))
     cooldowns = {
         family: int(remaining)
@@ -1085,11 +1124,18 @@ def select_candidate_mutation(
             if history
             else "generic-underperform"
         )
+        last_metric_path = (
+            metric_path_signature(history[-1].get("causal_metric_path"))
+            if history
+            else "generic-path"
+        )
         last_family = str(history[-1].get("family") or "") if history else ""
         candidate_keys = (
             [
-                f"{last_family}|{last_failure_signature}",
-                f"{last_family}|generic-underperform",
+                f"{last_family}|{last_failure_signature}|{last_metric_path}",
+                f"{last_family}|{last_failure_signature}|generic-path",
+                f"{last_family}|generic-underperform|{last_metric_path}",
+                f"{last_family}|generic-underperform|generic-path",
             ]
             if last_family
             else []
@@ -1109,6 +1155,10 @@ def select_candidate_mutation(
                 )
                 confidence = float(entry.get("confidence", 0.5))
                 effective *= max(0.2, confidence + 0.5)
+                effective += metric_path_match_bonus(
+                    str(entry.get("metric_path_signature", "generic-path")),
+                    last_metric_path,
+                )
                 ranked.append((effective, next_family))
             ranked.sort(reverse=True)
             if ranked and ranked[0][0] > 0:

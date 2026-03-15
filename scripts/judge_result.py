@@ -133,6 +133,7 @@ def main() -> None:
         status,
         record.get("redirect_if_underperforming"),
         record.get("failure_signature"),
+        record.get("causal_metric_path"),
     )
     next_stage = "crash_recoverable" if status == "crash" else "ready_to_execute"
     set_session_stage(session, next_stage, f"judged {args.run_id} as {status}")

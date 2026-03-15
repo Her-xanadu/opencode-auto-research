@@ -784,6 +784,34 @@ def build_mechanism_units(
     return units[:4]
 
 
+def metric_path_for_target(target_object: str) -> List[str]:
+    mapping = {
+        "representation": [
+            "representation_quality",
+            "separation_margin",
+            "target_metric",
+        ],
+        "objective": ["loss_shape", "optimization_stability", "target_metric"],
+        "traffic structure": [
+            "structure_signal",
+            "cross_flow_consistency",
+            "target_metric",
+        ],
+        "adaptation policy": [
+            "adaptation_stability",
+            "shift_robustness",
+            "target_metric",
+        ],
+        "model architecture": [
+            "feature_capacity",
+            "generalization_margin",
+            "target_metric",
+        ],
+        "feature pipeline": ["feature_quality", "signal_retention", "target_metric"],
+    }
+    return mapping.get(target_object, ["intermediate_signal", "target_metric"])
+
+
 def extract_claims_from_markdown(
     paths: PaperPaths, meta: Dict[str, Any]
 ) -> List[Dict[str, Any]]:
@@ -979,6 +1007,10 @@ def build_paper_record(paths: PaperPaths, meta: Dict[str, Any]) -> Dict[str, Any
         for unit in mechanism_units
         if str(unit.get("claim_type") or "") == "negative_lesson"
     ][:2]
+    metric_paths = [
+        metric_path_for_target(str(unit.get("target_object") or ""))
+        for unit in mechanism_units[:2]
+    ]
     cautionary_score = compute_cautionary_score(meta, claim_rows, summary)
     innovation_potential = compute_innovation_potential(meta, claim_rows)
     all_tags = sorted(
@@ -1006,6 +1038,7 @@ def build_paper_record(paths: PaperPaths, meta: Dict[str, Any]) -> Dict[str, Any
         "limitation_claims": compact_limitation_claims,
         "negative_lessons": compact_negative_lessons,
         "mechanism_units": mechanism_units,
+        "metric_paths": metric_paths,
         "cautionary_score": cautionary_score,
         "innovation_potential": innovation_potential,
         "tags": all_tags,

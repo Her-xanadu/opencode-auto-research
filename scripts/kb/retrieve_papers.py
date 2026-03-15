@@ -62,6 +62,7 @@ def paper_text_blob(paper: Dict[str, Any]) -> str:
             " ".join(paper.get("transfer_hints") or []),
             " ".join(paper.get("limitation_claims") or []),
             " ".join(paper.get("negative_lessons") or []),
+            " ".join(" ".join(path) for path in paper.get("metric_paths") or []),
             " ".join(
                 str(unit.get("intervention") or "")
                 for unit in paper.get("mechanism_units") or []
@@ -135,6 +136,35 @@ def prediction_sentence(lead_unit: Dict[str, Any]) -> str:
     return f"若实施“{action}”，则{target}相关中间指标应先稳定改善；若中间指标不变而目标指标上升，则该机制解释不成立。"
 
 
+def metric_path_sentence(lead_unit: Dict[str, Any]) -> List[str]:
+    target = str(lead_unit.get("target_object") or "")
+    mapping = {
+        "representation": [
+            "representation_quality",
+            "separation_margin",
+            "target_metric",
+        ],
+        "objective": ["loss_shape", "optimization_stability", "target_metric"],
+        "traffic structure": [
+            "structure_signal",
+            "cross_flow_consistency",
+            "target_metric",
+        ],
+        "adaptation policy": [
+            "adaptation_stability",
+            "shift_robustness",
+            "target_metric",
+        ],
+        "model architecture": [
+            "feature_capacity",
+            "generalization_margin",
+            "target_metric",
+        ],
+        "feature pipeline": ["feature_quality", "signal_retention", "target_metric"],
+    }
+    return mapping.get(target, ["intermediate_signal", "target_metric"])
+
+
 def killer_ablation_sentence(lead_unit: Dict[str, Any]) -> str:
     target = zh_target_object(str(lead_unit.get("target_object") or "核心机制"))
     action = strip_period(lead_unit.get("action_sentence") or "主机制改动")
@@ -162,10 +192,12 @@ def score_paper(
     limitation_count = len(paper.get("limitation_claims") or []) + len(
         paper.get("negative_lessons") or []
     )
+    metric_path_bonus = 0.4 * len(paper.get("metric_paths") or [])
     exploit_score = (
         overlap * 2.0
         + family_match * 1.5
         + innovation_potential
+        + metric_path_bonus
         + posterior_usefulness
         - cooldown_penalty * 2.0
         - (1.5 if cautionary else 0.0)
@@ -173,6 +205,7 @@ def score_paper(
     orthogonal_score = (
         overlap * 1.2
         + innovation_potential
+        + metric_path_bonus
         + transfer_count * 0.6
         + posterior_usefulness
         - cooldown_penalty
@@ -349,6 +382,11 @@ def innovation_brief_for_agent(
         "support_unit": support_unit,
         "guard_unit": guard_unit,
         "falsifiable_prediction": prediction,
+        "causal_metric_path": (
+            metric_path_sentence(lead_unit)
+            if lead_unit
+            else ["intermediate_signal", "target_metric"]
+        ),
         "killer_ablation": (
             killer_ablation_sentence(lead_unit)
             if lead_unit
