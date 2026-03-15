@@ -1,3 +1,4 @@
+import path from "node:path";
 import { readJson, writeJson } from "../utils/fs";
 import { getRecoveryCheckpointPath } from "../utils/paths";
 
@@ -12,7 +13,10 @@ export async function saveRecoveryCheckpoint(workspaceRoot: string, checkpoint: 
 }
 
 export async function resumeExperiment(workspaceRoot: string): Promise<{ resumed: boolean; source: string | null }> {
-  const checkpoint = await readJson<RecoveryCheckpoint | null>(getRecoveryCheckpointPath(workspaceRoot), null);
+  let checkpoint = await readJson<RecoveryCheckpoint | null>(getRecoveryCheckpointPath(workspaceRoot), null);
+  if (!checkpoint) {
+    checkpoint = await readJson<RecoveryCheckpoint | null>(path.join(workspaceRoot, ".opencode", "auto-experiment", "recovery-checkpoint.json"), null);
+  }
   if (!checkpoint) {
     return { resumed: false, source: null };
   }

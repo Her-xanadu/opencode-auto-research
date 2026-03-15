@@ -4,7 +4,7 @@ import path from "node:path";
 export const GLOBAL_CONFIG_PATH = path.join(homedir(), ".config", "opencode", "opencode-auto-experiment.json");
 
 export function getExperimentRoot(workspaceRoot: string): string {
-  return path.join(workspaceRoot, ".opencode", "auto-experiment");
+  return path.join(workspaceRoot, "experiments");
 }
 
 export function getCompatConfigDir(workspaceRoot: string): string {
@@ -48,7 +48,7 @@ export function getCompatRunEventsPath(workspaceRoot: string, runId: string): st
 }
 
 export function getWorkspaceConfigPath(workspaceRoot: string): string {
-  return path.join(getExperimentRoot(workspaceRoot), "experiment-spec.json");
+  return path.join(workspaceRoot, ".opencode", "auto-experiment", "experiment-spec.json");
 }
 
 export function getSessionPath(workspaceRoot: string): string {
@@ -72,11 +72,11 @@ export function getOrchestrationDir(workspaceRoot: string): string {
 }
 
 export function getResultPacketPath(workspaceRoot: string): string {
-  return path.join(getAnalysisDir(workspaceRoot), "result-packet.json");
+  return path.join(getExperimentRoot(workspaceRoot), "result_packet.json");
 }
 
 export function getProposalCardsPath(workspaceRoot: string): string {
-  return path.join(getAnalysisDir(workspaceRoot), "proposal-cards.jsonl");
+  return path.join(getExperimentRoot(workspaceRoot), "proposal_cards.jsonl");
 }
 
 export function getOrchestrationTracePath(workspaceRoot: string): string {

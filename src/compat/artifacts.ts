@@ -1,13 +1,8 @@
-import { appendJsonl, writeJson, writeText } from "../utils/fs";
+import { writeText } from "../utils/fs";
 import type { ExperimentSession } from "../experiment/session";
 import type { ExperimentSpec } from "../spec/schema";
 import {
-  getCompatAttemptsPath,
-  getCompatBestPath,
   getCompatGoalPath,
-  getCompatProposalCardsPath,
-  getCompatRunEventsPath,
-  getCompatSessionPath,
 } from "../utils/paths";
 
 function yamlList(values: string[]): string {
@@ -37,21 +32,27 @@ export async function syncGoalArtifact(workspaceRoot: string, spec: ExperimentSp
 }
 
 export async function syncSessionArtifact(workspaceRoot: string, session: ExperimentSession): Promise<void> {
-  await writeJson(getCompatSessionPath(workspaceRoot), session);
+  void workspaceRoot;
+  void session;
 }
 
 export async function syncAttemptArtifact(workspaceRoot: string, record: unknown): Promise<void> {
-  await appendJsonl(getCompatAttemptsPath(workspaceRoot), record);
+  void workspaceRoot;
+  void record;
 }
 
 export async function syncBestArtifact(workspaceRoot: string, best: unknown): Promise<void> {
-  await writeJson(getCompatBestPath(workspaceRoot), best);
+  void workspaceRoot;
+  void best;
 }
 
 export async function syncProposalCardArtifact(workspaceRoot: string, card: unknown): Promise<void> {
-  await appendJsonl(getCompatProposalCardsPath(workspaceRoot), card);
+  void workspaceRoot;
+  void card;
 }
 
 export async function syncRunEventArtifact(workspaceRoot: string, runId: string, event: unknown): Promise<void> {
-  await appendJsonl(getCompatRunEventsPath(workspaceRoot, runId), event);
+  void workspaceRoot;
+  void runId;
+  void event;
 }
