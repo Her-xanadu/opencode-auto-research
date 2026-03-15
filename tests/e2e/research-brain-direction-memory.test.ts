@@ -64,6 +64,8 @@ describe("research brain direction memory", () => {
           last_round: 1,
           reason: "停止重复 objective.loss，转向 repr.feature",
           metric_path_signature: "loss_shape->optimization_stability->target_metric",
+          failure_signature: "loss path stalled",
+          failure_type: "causal_path_failure",
           success_count: 2,
           failure_count: 1,
           crash_count: 0,
@@ -74,6 +76,8 @@ describe("research brain direction memory", () => {
           last_round: 1,
           reason: "停止重复 objective.loss，转向 arch.backbone",
           metric_path_signature: "loss_shape->optimization_stability->target_metric",
+          failure_signature: "loss path stalled",
+          failure_type: "causal_path_failure",
           success_count: 0,
           failure_count: 3,
           crash_count: 1,
@@ -86,5 +90,7 @@ describe("research brain direction memory", () => {
     await execFileAsync("python3", [innovationLoopScript, "tick", "--config", configPath, "--workspace", workspace, "--mode", "mock"], { cwd: workspace });
     const proposals = JSON.parse(await fs.readFile(path.join(workspace, "experiments", "proposals", "round-0001.json"), "utf8"));
     expect(proposals.next_primary_hypothesis.family).toBe("repr.feature");
+    const savedSession = JSON.parse(await fs.readFile(sessionPath, "utf8"));
+    expect(savedSession.direction_memory_v2["objective.loss|generic-underperform|loss_shape->optimization_stability->target_metric"]["repr.feature"].failure_type).toBe("causal_path_failure");
   }, 15000);
 });

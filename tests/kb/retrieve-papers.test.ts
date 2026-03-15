@@ -47,6 +47,7 @@ describe("kb retrieve papers", () => {
     expect(result.innovation_briefs.athena.guardrails.length).toBeGreaterThan(0);
     expect(result.selected[0].mechanism_units.length).toBeGreaterThan(0);
     expect(result.selected[0].metric_paths.length).toBeGreaterThan(0);
+    expect(result.selected[0].grounding_confidence).toBeGreaterThan(0);
     expect(result.selected[0].mechanism_units[0].intervention).not.toContain("作者解决了什么问题");
     expect(result.selected[0].mechanism_units[0].intervention).not.toBe("1.");
     expect(result.selected[0].mechanism_units[0].action_sentence.startsWith("对")).toBe(true);
