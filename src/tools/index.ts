@@ -200,7 +200,7 @@ export const experiment_acceptance_review: ToolDefinition = tool({
 });
 
 export const experiment_run_analysis: ToolDefinition = tool({
-  description: "Run tri-model analysis for the current result packet and persist proposal cards.",
+  description: "Run legacy tri-model placeholder analysis for the current result packet and persist compatibility proposal cards.",
   args: {
     workspace_root: tool.schema.string().optional(),
   },

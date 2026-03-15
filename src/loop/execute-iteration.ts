@@ -1,4 +1,4 @@
-import { syncAttemptArtifact, syncBestArtifact, syncResultPacketArtifact, syncRunEventArtifact } from "../compat/artifacts";
+import { syncAttemptArtifact, syncBestArtifact, syncRunEventArtifact } from "../compat/artifacts";
 import { appendJsonl, writeJson } from "../utils/fs";
 import { getBestPath, getResultPacketPath, getRunEventsPath, getRunsPath } from "../utils/paths";
 import { nowIso } from "../utils/time";
@@ -84,7 +84,6 @@ export async function executeIteration(input: {
     decision_status: decision.status,
   };
   await writeJson(getResultPacketPath(input.workspaceRoot), packet);
-  await syncResultPacketArtifact(input.workspaceRoot, packet);
   const proposals = runTriModelAnalysis(packet);
   const aggregate = aggregateProposals(proposals);
   const record = {

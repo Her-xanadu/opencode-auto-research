@@ -2,6 +2,8 @@ import { createId } from "../utils/ids";
 import type { ResultPacket } from "./result-packet";
 import type { ProposalCard } from "./proposal-card";
 
+export const TRI_MODEL_ANALYSIS_MODE = "legacy_placeholder" as const;
+
 export function runTriModelAnalysis(packet: ResultPacket): ProposalCard[] {
   return [
     {

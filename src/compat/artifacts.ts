@@ -6,7 +6,6 @@ import {
   getCompatBestPath,
   getCompatGoalPath,
   getCompatProposalCardsPath,
-  getCompatResultPacketPath,
   getCompatRunEventsPath,
   getCompatSessionPath,
 } from "../utils/paths";
@@ -47,10 +46,6 @@ export async function syncAttemptArtifact(workspaceRoot: string, record: unknown
 
 export async function syncBestArtifact(workspaceRoot: string, best: unknown): Promise<void> {
   await writeJson(getCompatBestPath(workspaceRoot), best);
-}
-
-export async function syncResultPacketArtifact(workspaceRoot: string, packet: unknown): Promise<void> {
-  await writeJson(getCompatResultPacketPath(workspaceRoot), packet);
 }
 
 export async function syncProposalCardArtifact(workspaceRoot: string, card: unknown): Promise<void> {
