@@ -91,3 +91,24 @@ export const controllerResearchContextSchema = z
 export type ControllerSession = z.infer<typeof controllerSessionSchema>;
 export type ControllerProposalContract = z.infer<typeof controllerProposalContractSchema>;
 export type ControllerResearchContext = z.infer<typeof controllerResearchContextSchema>;
+
+export const controllerRetrievalResultSchema = z
+  .object({
+    round: z.number().int().optional(),
+    query_tokens: z.array(z.string()).optional().default([]),
+    cooldowns: z.array(z.string()).optional().default([]),
+    selected: z.array(z.record(z.string(), z.unknown())).optional().default([]),
+    top_ranked: z.array(z.record(z.string(), z.unknown())).optional().default([]),
+    innovation_briefs: z.record(z.string(), z.unknown()).optional().default({}),
+    output: z.string().optional(),
+  })
+  .passthrough();
+
+export const controllerEvidenceMetadataSchema = z
+  .object({
+    round: z.number().int().optional(),
+    output: z.string().optional(),
+    char_count: z.number().int().optional(),
+    selected_count: z.number().int().optional(),
+  })
+  .passthrough();

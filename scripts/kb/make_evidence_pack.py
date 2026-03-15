@@ -35,14 +35,49 @@ def render_paper_line(prefix: str, paper: Dict[str, Any]) -> str:
     return f"### {prefix}\n- paper_id: `{paper.get('paper_id')}`\n- 标题: {paper.get('title_zh') or paper.get('title_en')}\n- 方法族: {tags or 'general'}\n- 为什么入选: {reason}\n- 关键机制: {compact(mechanism or summary, 110)}\n- 风险提醒: {compact(risk or '未显式记录', 90)}\n"
 
 
-def ensure_length(text: str) -> str:
-    length = len(text)
-    if length < 500:
-        padding = "\n## 本轮建议边界\n- 仅允许单一主改动。\n- 每个主方案至少绑定两篇本地论文。\n- 优先选择与当前 family 或失败模式相关的可归因机制。\n"
-        text += padding
-    if len(text) > 2400:
-        text = text[:2390].rstrip() + "\n"
-    return text
+def cap_line(line: str, limit: int) -> str:
+    if len(line) <= limit:
+        return line
+    return line[: limit - 1].rstrip("，。；; ") + "…"
+
+
+def render_budgeted(lines: List[str]) -> str:
+    capped: List[str] = []
+    budgets = {
+        "推荐论文": 240,
+        "正交论文": 180,
+        "警示论文": 180,
+        "Apollo 主攻假设": 160,
+        "Apollo 组合机制": 180,
+        "Apollo 主机制": 120,
+        "Apollo 辅助信号": 120,
+        "Hermes 正交假设": 160,
+        "Hermes 组合机制": 180,
+        "Athena 守门提醒": 150,
+        "关键可证伪预测": 200,
+        "Killer ablation": 200,
+    }
+    current_budget = None
+    consumed = 0
+    for line in lines:
+        if line.startswith("### "):
+            current_budget = next(
+                (value for key, value in budgets.items() if key in line), None
+            )
+            consumed = 0
+            capped.append(line)
+            continue
+        if line.startswith("- ") and current_budget is not None:
+            remaining = max(40, current_budget - consumed)
+            clipped = cap_line(line, remaining)
+            consumed += len(clipped)
+            capped.append(clipped)
+            continue
+        capped.append(line)
+    rendered = "\n".join(capped).strip() + "\n"
+    if len(rendered) < 500:
+        rendered += "\n## 本轮建议边界\n- 仅允许单一主改动。\n- 每个主方案至少绑定两篇本地论文。\n- 优先选择与当前 family 或失败模式相关的可归因机制。\n"
+    return rendered
 
 
 def main() -> None:
@@ -114,7 +149,7 @@ def main() -> None:
             "",
         ]
     )
-    rendered = ensure_length("\n".join(lines).strip() + "\n")
+    rendered = render_budgeted(lines)
     evidence_dir = experiments_research_dir(workspace_root, config)
     evidence_dir.mkdir(parents=True, exist_ok=True)
     output_path = (

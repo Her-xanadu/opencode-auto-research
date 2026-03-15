@@ -44,7 +44,7 @@ describe("kb evidence pack", () => {
     expect(rendered).toContain("Apollo 组合机制");
     expect(rendered).toContain("Apollo 组合兼容分");
     expect(rendered).toContain("Killer ablation");
-    expect(rendered).toContain("中间指标应先稳定改善");
+    expect(rendered).toContain("关键可证伪预测");
     expect(rendered).toContain("Athena 守门提醒");
     expect(rendered.length).toBeGreaterThanOrEqual(500);
     expect(rendered.length).toBeLessThanOrEqual(2400);

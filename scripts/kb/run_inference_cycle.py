@@ -38,7 +38,12 @@ def main() -> None:
     session = workspace_root / "experiments" / "session.json"
     best = workspace_root / "experiments" / "best.json"
     attempts = workspace_root / "experiments" / "attempts.jsonl"
-    result_packet = workspace_root / "experiments" / "result-packet.json"
+    result_packet = workspace_root / "experiments" / "result_packet.json"
+    if not result_packet.exists():
+        fallback_result_packet = workspace_root / "experiments" / "result-packet.json"
+        result_packet = (
+            fallback_result_packet if fallback_result_packet.exists() else result_packet
+        )
     if not (session.exists() and best.exists() and attempts.exists()):
         emit_json(
             {

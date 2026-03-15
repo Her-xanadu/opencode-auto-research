@@ -1,11 +1,35 @@
 import { describe, expect, it } from "vitest";
 import resultPacket from "../../fixtures/results/result-packet-good.json";
 import { proposalCardSchema, proposalContractSchema } from "../../src/analysis/proposal-card";
-import { controllerSessionSchema, resultPacketSchema } from "../../src/analysis/result-packet";
+import { controllerSessionSchema, controllerResearchContextSchema, resultPacketSchema } from "../../src/analysis/result-packet";
+import { controllerEvidenceMetadataSchema, controllerRetrievalResultSchema } from "../../src/controller/schema";
 
 describe("analysis schemas", () => {
   it("accepts a valid result packet and rejects invalid proposal cards", () => {
     expect(() => resultPacketSchema.parse(resultPacket)).not.toThrow();
+    expect(() =>
+      controllerRetrievalResultSchema.parse({
+        round: 1,
+        query_tokens: ["ood", "drift"],
+        selected: [{ paper_id: "p1" }],
+        innovation_briefs: { apollo: { hypothesis_seed: "x" } },
+      }),
+    ).not.toThrow();
+    expect(() =>
+      controllerEvidenceMetadataSchema.parse({
+        round: 1,
+        output: "experiments/research/evidence-round-0001.md",
+        char_count: 1200,
+        selected_count: 4,
+      }),
+    ).not.toThrow();
+    expect(() =>
+      controllerResearchContextSchema.parse({
+        research_context_id: "research-round-0001",
+        retrieval_path: "experiments/research/retrieval-cache/retrieval-round-0001.json",
+        evidence_pack_path: "experiments/research/evidence-round-0001.md",
+      }),
+    ).not.toThrow();
     expect(() =>
       proposalContractSchema.parse({
         family: "objective.loss",
