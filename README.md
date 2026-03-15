@@ -302,6 +302,11 @@ Remote execution is supported as a contract pattern rather than a separate contr
 
 See `REMOTE_EXECUTION.md` for the exact contract.
 
+Validation paths:
+
+- `npm test -- tests/e2e/python-controller-real-dvc.test.ts`
+- `npm test -- tests/e2e/remote-contract.test.ts`
+
 ## Daily Scheduler Split
 
 The previous monolithic `daily-research-brain` job has been split into two clearer chains:

@@ -31,10 +31,6 @@ export function getCompatBestPath(workspaceRoot: string): string {
   return path.join(getCompatExperimentsDir(workspaceRoot), "best.json");
 }
 
-export function getCompatResultPacketPath(workspaceRoot: string): string {
-  return path.join(getCompatExperimentsDir(workspaceRoot), "result_packet.json");
-}
-
 export function getCompatProposalCardsPath(workspaceRoot: string): string {
   return path.join(getCompatExperimentsDir(workspaceRoot), "proposal_cards.jsonl");
 }

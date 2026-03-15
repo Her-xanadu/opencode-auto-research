@@ -22,6 +22,7 @@ from ae_common import (
     run_stage,
     restore_parent_snapshot,
     save_parent_snapshot,
+    save_run_manifest,
     save_pending_result,
     session_path,
     start_dvc_queue_worker,
@@ -94,7 +95,7 @@ Required JSON fields:
 WORKSPACE_ROOT: {workspace}
 MUTATION_JSON: {json.dumps(mutation, ensure_ascii=False)}
 """.strip()
-    return run_opencode_agent("sisyphus-junior", prompt)
+    return run_opencode_agent("sisyphus-junior", prompt, workspace=workspace)
 
 
 def main() -> None:
@@ -141,6 +142,21 @@ def main() -> None:
             "run_id": run_id,
             "checkpoint_path": str(checkpoint),
             "parent_run_id": current_best_exp_ref(workspace) or "baseline",
+        },
+    )
+    save_run_manifest(
+        workspace,
+        run_id,
+        {
+            "run_id": run_id,
+            "proposal_id": mutation.get("proposal_id"),
+            "family": mutation.get("family"),
+            "touched_files": touched_files,
+            "created_files": [],
+            "deleted_files": [],
+            "checkpoint_path": str(checkpoint),
+            "dvc_exp_ref": run_id,
+            "resume_from": args.resume_from,
         },
     )
 

@@ -692,6 +692,7 @@ def collect_live_round_proposals(
             result_packet,
             research_context,
         ),
+        workspace=workspace,
     )
     divergence_raw = run_opencode_agent(
         "Hermes",
@@ -706,10 +707,12 @@ def collect_live_round_proposals(
             research_context,
             primary_proposal=exploit_raw,
         ),
+        workspace=workspace,
     )
     guard = run_opencode_agent(
         "Athena",
         build_guard_prompt(workspace, exploit_raw, divergence_raw, research_context),
+        workspace=workspace,
     )
 
     exploit = materialize_live_choice(

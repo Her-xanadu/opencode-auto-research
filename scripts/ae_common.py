@@ -715,7 +715,13 @@ def opencode_repo_dir() -> pathlib.Path:
 
 
 def opencode_agent_model() -> str:
-    return os.environ.get("INNOVATION_LOOP_AGENT_MODEL", "kimi-for-coding/kimi-k2.5")
+    env_override = os.environ.get("INNOVATION_LOOP_AGENT_MODEL")
+    if env_override:
+        return env_override
+    repo = opencode_repo_dir()
+    config = read_json(repo / "opencode.json", {})
+    model = dict(config.get("agent", {})).get("Apollo", {}).get("model")
+    return str(model or "kimi-for-coding/kimi-k2.5")
 
 
 def run_opencode_agent(
@@ -724,6 +730,7 @@ def run_opencode_agent(
     *,
     model: Optional[str] = None,
     timeout: int = 240000,
+    workspace: Optional[pathlib.Path] = None,
 ) -> Dict[str, Any]:
     repo_dir = opencode_repo_dir()
     command = [
@@ -741,14 +748,56 @@ def run_opencode_agent(
     result = run_process(
         command, repo_dir, check=False, timeout=max(timeout / 1000.0, 1.0)
     )
+    if workspace is not None:
+        artifact_dir = workspace / "experiments" / "live-specialist-failures"
+        artifact_dir.mkdir(parents=True, exist_ok=True)
+        raw_path = artifact_dir / f"{agent.lower()}-{int(time.time() * 1000)}.json"
+    else:
+        raw_path = None
     if result.returncode != 0:
+        if raw_path is not None:
+            write_json(
+                raw_path,
+                {
+                    "agent": agent,
+                    "kind": "subprocess_error",
+                    "stdout": result.stdout,
+                    "stderr": result.stderr,
+                    "returncode": result.returncode,
+                },
+            )
         raise RuntimeError(
             result.stderr.strip()
             or result.stdout.strip()
             or f"opencode run failed for {agent}"
         )
-    parsed = extract_json_payload(result.stdout)
+    try:
+        parsed = extract_json_payload(result.stdout)
+    except Exception:
+        if raw_path is not None:
+            write_json(
+                raw_path,
+                {
+                    "agent": agent,
+                    "kind": "schema_parse_failure",
+                    "stdout": result.stdout,
+                    "stderr": result.stderr,
+                    "returncode": result.returncode,
+                },
+            )
+        raise
     if not isinstance(parsed, dict):
+        if raw_path is not None:
+            write_json(
+                raw_path,
+                {
+                    "agent": agent,
+                    "kind": "schema_parse_failure",
+                    "stdout": result.stdout,
+                    "stderr": result.stderr,
+                    "returncode": result.returncode,
+                },
+            )
         raise RuntimeError(f"expected JSON object from {agent}")
     return parsed
 
@@ -994,19 +1043,35 @@ def parse_queue_status(stdout: str, task_id: Optional[str]) -> QueueState:
 
 def save_parent_snapshot(
     workspace: pathlib.Path, run_id: str, touched_files: List[str]
-) -> Dict[str, str]:
-    snapshot: Dict[str, str] = {}
+) -> Dict[str, Dict[str, Any]]:
+    snapshot: Dict[str, Dict[str, Any]] = {}
     for relative in touched_files:
         absolute = workspace / relative
-        snapshot[relative] = read_text(absolute)
+        snapshot[relative] = {
+            "exists": absolute.exists(),
+            "content": read_text(absolute) if absolute.exists() else "",
+        }
     write_json(run_dir(workspace, run_id) / "parent_snapshot.json", snapshot)
     return snapshot
 
 
 def restore_parent_snapshot(workspace: pathlib.Path, run_id: str) -> None:
     snapshot = read_json(run_dir(workspace, run_id) / "parent_snapshot.json", {})
-    for relative, content in snapshot.items():
-        write_text(workspace / relative, content)
+    for relative, entry in snapshot.items():
+        absolute = workspace / relative
+        if isinstance(entry, dict):
+            if entry.get("exists", False):
+                write_text(absolute, str(entry.get("content", "")))
+            else:
+                absolute.unlink(missing_ok=True)
+        else:
+            write_text(absolute, str(entry))
+
+
+def save_run_manifest(
+    workspace: pathlib.Path, run_id: str, payload: Dict[str, Any]
+) -> None:
+    write_json(run_dir(workspace, run_id) / "meta.json", payload)
 
 
 def load_pending_result(workspace: pathlib.Path, run_id: str) -> Dict[str, Any]:
