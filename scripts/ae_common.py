@@ -523,6 +523,25 @@ def update_redirect_memory(
         overlap = len(set(stored_parts) & set(current_parts))
         return 0.2 * overlap
 
+    def classify_failure_type(status: str, failure_signature: Optional[str]) -> str:
+        lowered = str(failure_signature or "").lower()
+        if status == "crash":
+            return "runtime_crash"
+        if any(token in lowered for token in ["repo", "path", "侵入", "workspace"]):
+            return "repo_mismatch"
+        if any(
+            token in lowered for token in ["compute", "gpu", "oom", "timeout", "memory"]
+        ):
+            return "compute_mismatch"
+        if any(
+            token in lowered
+            for token in ["stability", "loss", "中间指标", "metric", "stalled"]
+        ):
+            return "causal_path_failure"
+        if any(token in lowered for token in ["bias", "shortcut", "捷径", "伪泛化"]):
+            return "shortcut_failure"
+        return "generic_underperform"
+
     if not family:
         session["redirect_memory"] = memory
         session["direction_memory"] = direction_memory
@@ -566,8 +585,9 @@ def update_redirect_memory(
                 "updated_at": now_iso(),
             }
             failure_key = str(failure_signature or "generic-underperform")
+            failure_type = classify_failure_type(status, failure_signature)
             path_key = metric_path_signature(causal_metric_path)
-            edge_key = f"{family}|{failure_key}|{path_key}"
+            edge_key = f"{family}|{failure_type}|{path_key}"
             weight_step = 1.5 if status == "crash" else 1.0
             bucket_v2 = dict(direction_memory_v2.get(edge_key, {}))
             existing = dict(bucket_v2.get(next_family, {}))
@@ -584,6 +604,8 @@ def update_redirect_memory(
                 "last_round": int(session.get("iteration_count", 0)) + 1,
                 "reason": str(redirect),
                 "metric_path_signature": path_key,
+                "failure_signature": failure_key,
+                "failure_type": failure_type,
                 "success_count": success_count,
                 "failure_count": failure_count,
                 "crash_count": crash_count,
@@ -1087,6 +1109,23 @@ def select_candidate_mutation(
         overlap = len(set(stored_parts) & set(current_parts))
         return 0.2 * overlap
 
+    def classify_failure_type(failure_signature: str) -> str:
+        lowered = str(failure_signature or "").lower()
+        if any(token in lowered for token in ["repo", "path", "侵入", "workspace"]):
+            return "repo_mismatch"
+        if any(
+            token in lowered for token in ["compute", "gpu", "oom", "timeout", "memory"]
+        ):
+            return "compute_mismatch"
+        if any(
+            token in lowered
+            for token in ["stability", "loss", "中间指标", "metric", "stalled"]
+        ):
+            return "causal_path_failure"
+        if any(token in lowered for token in ["bias", "shortcut", "捷径", "伪泛化"]):
+            return "shortcut_failure"
+        return "generic_underperform"
+
     session = load_session(session_path(workspace))
     cooldowns = {
         family: int(remaining)
@@ -1124,6 +1163,7 @@ def select_candidate_mutation(
             if history
             else "generic-underperform"
         )
+        last_failure_type = classify_failure_type(last_failure_signature)
         last_metric_path = (
             metric_path_signature(history[-1].get("causal_metric_path"))
             if history
@@ -1132,10 +1172,10 @@ def select_candidate_mutation(
         last_family = str(history[-1].get("family") or "") if history else ""
         candidate_keys = (
             [
-                f"{last_family}|{last_failure_signature}|{last_metric_path}",
-                f"{last_family}|{last_failure_signature}|generic-path",
-                f"{last_family}|generic-underperform|{last_metric_path}",
-                f"{last_family}|generic-underperform|generic-path",
+                f"{last_family}|{last_failure_type}|{last_metric_path}",
+                f"{last_family}|{last_failure_type}|generic-path",
+                f"{last_family}|generic_underperform|{last_metric_path}",
+                f"{last_family}|generic_underperform|generic-path",
             ]
             if last_family
             else []

@@ -188,6 +188,7 @@ def score_paper(
     posterior_row = posterior.get(str(paper.get("paper_id")), {})
     posterior_usefulness = float(posterior_row.get("posterior_usefulness", 0.0))
     innovation_potential = float(paper.get("innovation_potential", 0.0))
+    grounding_confidence = float(paper.get("grounding_confidence", 0.0))
     transfer_count = len(paper.get("transfer_hints") or [])
     limitation_count = len(paper.get("limitation_claims") or []) + len(
         paper.get("negative_lessons") or []
@@ -197,6 +198,7 @@ def score_paper(
         overlap * 2.0
         + family_match * 1.5
         + innovation_potential
+        + grounding_confidence
         + metric_path_bonus
         + posterior_usefulness
         - cooldown_penalty * 2.0
@@ -205,6 +207,7 @@ def score_paper(
     orthogonal_score = (
         overlap * 1.2
         + innovation_potential
+        + grounding_confidence
         + metric_path_bonus
         + transfer_count * 0.6
         + posterior_usefulness
@@ -223,6 +226,7 @@ def score_paper(
         "cooldown_penalty": cooldown_penalty,
         "posterior_usefulness": posterior_usefulness,
         "innovation_potential": innovation_potential,
+        "grounding_confidence": grounding_confidence,
         "cautionary_score": cautionary_score,
         "cautionary": cautionary,
     }

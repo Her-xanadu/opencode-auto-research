@@ -24,7 +24,7 @@ def render_paper_line(prefix: str, paper: Dict[str, Any]) -> str:
         return text[:limit].rstrip("，。；; ")
 
     tags = " / ".join(paper.get("family_tags") or paper.get("method_tags") or [])
-    reason = f"匹配分 {paper.get('score', 0)}，证据质量 {paper.get('evidence_quality', 'unknown')}"
+    reason = f"匹配分 {paper.get('score', 0)}，证据质量 {paper.get('evidence_quality', 'unknown')}，grounding 置信度 {paper.get('grounding_confidence', 'unknown')}"
     summary = compact(str(paper.get("summary") or ""), 90)
     mechanism = "；".join(
         (paper.get("mechanism_claims") or paper.get("transfer_hints") or [])[:2]

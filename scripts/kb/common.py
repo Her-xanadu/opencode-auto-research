@@ -981,6 +981,33 @@ def compute_innovation_potential(
     return round(score, 4)
 
 
+def compute_grounding_confidence(
+    meta: Dict[str, Any], claim_rows: List[Dict[str, Any]]
+) -> float:
+    evidence_quality = str(meta.get("evidence_quality") or "unknown").lower()
+    quality_score = {
+        "high": 1.0,
+        "medium": 0.6,
+        "low": 0.2,
+        "高": 1.0,
+        "中": 0.6,
+        "低": 0.2,
+    }.get(evidence_quality, 0.3)
+    mechanism_count = len(claim_texts(claim_rows, "mechanism", 4))
+    transfer_count = len(claim_texts(claim_rows, "transfer_hint", 3))
+    limitation_count = len(claim_texts(claim_rows, "limitation", 3))
+    return round(
+        min(
+            1.0,
+            quality_score
+            + mechanism_count * 0.08
+            + transfer_count * 0.05
+            + limitation_count * 0.03,
+        ),
+        2,
+    )
+
+
 def build_paper_record(paths: PaperPaths, meta: Dict[str, Any]) -> Dict[str, Any]:
     markdown_text = read_text(paths.markdown, "") if paths.markdown else ""
     body = body_without_frontmatter(markdown_text)
@@ -1013,6 +1040,7 @@ def build_paper_record(paths: PaperPaths, meta: Dict[str, Any]) -> Dict[str, Any
     ]
     cautionary_score = compute_cautionary_score(meta, claim_rows, summary)
     innovation_potential = compute_innovation_potential(meta, claim_rows)
+    grounding_confidence = compute_grounding_confidence(meta, claim_rows)
     all_tags = sorted(
         set(
             to_list(meta.get("task_tags"))
@@ -1039,6 +1067,7 @@ def build_paper_record(paths: PaperPaths, meta: Dict[str, Any]) -> Dict[str, Any
         "negative_lessons": compact_negative_lessons,
         "mechanism_units": mechanism_units,
         "metric_paths": metric_paths,
+        "grounding_confidence": grounding_confidence,
         "cautionary_score": cautionary_score,
         "innovation_potential": innovation_potential,
         "tags": all_tags,

@@ -105,16 +105,8 @@ def collect_round_research_context(
     config_path = research_config_path(workspace)
     config = load_research_config(config_path)
     ensure_research_index(workspace, config_path, config)
-    retrieval = run_python(
-        "kb/retrieve_papers.py",
-        "--goal",
-        str((workspace / "configs" / "goal.yaml").resolve()),
-        "--session",
-        str(session_path(workspace)),
-        "--best",
-        str(best_path(workspace)),
-        "--attempts",
-        str(attempts_path(workspace)),
+    inference = run_python(
+        "kb/run_inference_cycle.py",
         "--workspace-root",
         str(workspace),
         "--config",
@@ -123,19 +115,14 @@ def collect_round_research_context(
         str(round_index),
         cwd=workspace,
     )
-    evidence = run_python(
-        "kb/make_evidence_pack.py",
-        "--round",
-        str(round_index),
-        "--retrieval",
-        str(retrieval["output"]),
-        "--workspace-root",
-        str(workspace),
-        "--config",
-        str(config_path),
-        cwd=workspace,
-    )
-    selected = retrieval.get("selected", [])
+    if inference.get("skipped"):
+        selected = []
+        retrieval = {"output": None, "innovation_briefs": {}}
+        evidence = {"output": None}
+    else:
+        retrieval = dict(inference.get("retrieval", {}))
+        evidence = dict(inference.get("evidence", {}))
+        selected = retrieval.get("selected", [])
     return {
         "research_context_id": f"research-round-{round_index:04d}",
         "retrieval_path": retrieval.get("output"),
@@ -159,9 +146,28 @@ def build_paper_grounding(research_context: dict, role: str) -> list[dict]:
     role_brief = dict(research_context.get("innovation_briefs", {})).get(
         role.lower(), {}
     )
+    lead_paper_id = role_brief.get("lead_paper_id")
+    support_paper_id = role_brief.get("support_paper_id")
+    guard_paper_id = role_brief.get("guard_paper_id")
+    semantic_order = []
+    for preferred_id in [lead_paper_id, support_paper_id, guard_paper_id]:
+        if preferred_id:
+            matched = next(
+                (
+                    paper
+                    for paper in ordered
+                    if str(paper.get("paper_id") or "") == str(preferred_id)
+                ),
+                None,
+            )
+            if matched is not None:
+                semantic_order.append(matched)
+    for paper in ordered:
+        if paper not in semantic_order:
+            semantic_order.append(paper)
     grounding = []
     seen = set()
-    for paper in ordered:
+    for paper in semantic_order:
         paper_id = str(paper.get("paper_id") or "").strip()
         if not paper_id or paper_id in seen:
             continue
@@ -173,6 +179,15 @@ def build_paper_grounding(research_context: dict, role: str) -> list[dict]:
                 "slot": paper.get("slot"),
                 "why_relevant": role_brief.get("hypothesis_seed")
                 or f"slot={paper.get('slot')} score={paper.get('score', 0)}",
+                "grounding_role": (
+                    "lead"
+                    if paper_id == str(lead_paper_id)
+                    else "support"
+                    if paper_id == str(support_paper_id)
+                    else "guard"
+                    if paper_id == str(guard_paper_id)
+                    else str(paper.get("slot") or "fallback")
+                ),
                 "mechanism_transfer": "；".join(
                     (
                         paper.get("mechanism_claims")
@@ -188,6 +203,8 @@ def build_paper_grounding(research_context: dict, role: str) -> list[dict]:
                     )[:2]
                 )[:160],
                 "mechanism_unit": (paper.get("mechanism_units") or [{}])[0],
+                "metric_path": (paper.get("metric_paths") or [[]])[0],
+                "grounding_confidence": paper.get("grounding_confidence"),
             }
         )
         if len(grounding) >= 2:
