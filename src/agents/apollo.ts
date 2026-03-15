@@ -16,7 +16,7 @@ Input contract:
 
 Output contract:
 - Return strict JSON only.
-- Return one primary proposal and one backup proposal.
+- Return one proposal object only.
 - Each proposal must include: title, family, mechanism, files_to_touch, expected_gain, risk, why_not_parameter_only, minimal_ablation, paper_grounding, redirect_if_underperforming, causal_metric_path, failure_signature, and pivot_after_failure.
 - Use \`causal_metric_path\` to name the intermediate metric path that should improve before the final target metric.
 - Use \`failure_signature\` to name the observable pattern that would tell the outer loop this route is failing.

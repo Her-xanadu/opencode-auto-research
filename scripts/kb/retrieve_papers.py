@@ -465,6 +465,16 @@ def main() -> None:
                 str(goal.get("target_metric") or ""),
                 str(best.get("family") or ""),
                 " ".join(
+                    str(item.get("failure_signature") or "")
+                    for item in attempts[-5:]
+                    if isinstance(item, dict)
+                ),
+                " ".join(
+                    str(item.get("reject_reason") or "")
+                    for item in attempts[-5:]
+                    if isinstance(item, dict)
+                ),
+                " ".join(
                     str(item.get("family") or "")
                     for item in attempts[-5:]
                     if isinstance(item, dict)

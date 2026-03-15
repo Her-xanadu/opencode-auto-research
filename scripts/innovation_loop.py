@@ -34,6 +34,7 @@ from ae_common import (
     ensure_repo_bootstrap_for_dvc,
     ensure_controller_not_running,
     load_goal,
+    load_pending_result,
     load_yaml_like,
     opencode_agent_model,
     proposal_round_path,
@@ -498,6 +499,7 @@ def build_live_proposal_prompt(
     cooldowns: dict,
     result_packet: dict,
     research_context: dict,
+    primary_proposal: dict | None = None,
 ) -> str:
     if os.environ.get("INNOVATION_LOOP_LIVE_TEST_MODE") == "1":
         scripted_choice = "objective" if agent == "Apollo" else "architecture"
@@ -520,7 +522,7 @@ def build_live_proposal_prompt(
                 "minimal_ablation": ["revert the single scripted change"],
                 "paper_grounding": grounding,
                 "redirect_if_underperforming": "切换到正交机制轴并停止重复当前主路线",
-                "causal_metric_path": "若该动作有效，中间稳定性指标应先改善，再传导到目标指标。",
+                "causal_metric_path": ["intermediate_stability", "target_metric"],
                 "failure_signature": "若中间指标不变而目标指标波动，则说明当前机制解释站不住。",
                 "pivot_after_failure": "切换到正交机制轴并停止重复当前主路线",
             },
@@ -547,6 +549,13 @@ def build_live_proposal_prompt(
         "research_context": prompt_ready_research_context(research_context, agent),
         "paper_grounding_seed": build_paper_grounding(research_context, agent),
     }
+    if primary_proposal is not None:
+        context["apollo_proposal"] = {
+            "choice": primary_proposal.get("choice"),
+            "family": primary_proposal.get("family"),
+            "mechanism": primary_proposal.get("mechanism"),
+            "paper_grounding": primary_proposal.get("paper_grounding", []),
+        }
     return f"""
 Return exactly one JSON object and nothing else.
 
@@ -573,6 +582,7 @@ Rules:
 - avoid cooldown families when possible
 - keep the reply short
 - paper_grounding must contain at least two unique paper_id values from the evidence pack
+- if Apollo proposal is provided, your family and mechanism axis must be materially orthogonal to Apollo unless no meaningful divergence exists
 
 Context: {json.dumps(context, ensure_ascii=False)}
 """.strip()
@@ -584,8 +594,8 @@ def build_guard_prompt(
     if os.environ.get("INNOVATION_LOOP_LIVE_TEST_MODE") == "1":
         return 'Return exactly {"verdict":"approve","validity_risks":[],"smallest_repair":"","single_change_ok":true,"paper_support_ok":true,"redirect_if_underperforming":"切换到正交机制轴并停止重复当前主路线","failure_signature":"若中间指标不变而目标指标波动，则说明当前机制解释站不住。"}.'
     context = {
-        "primary_choice": primary.get("choice"),
-        "backup_choice": backup.get("choice") if backup else None,
+        "primary_proposal": primary,
+        "backup_proposal": backup,
         "research_context": prompt_ready_research_context(research_context, "Athena"),
         "primary_grounding": primary.get("paper_grounding", []),
         "latest_redirect_hint": primary.get("redirect_if_underperforming"),
@@ -644,6 +654,8 @@ def materialize_live_choice(
     template["causal_metric_path"] = raw.get("causal_metric_path") or dict(
         research_context.get("innovation_briefs", {})
     ).get(role.lower(), {}).get("falsifiable_prediction")
+    if isinstance(template["causal_metric_path"], str):
+        template["causal_metric_path"] = [template["causal_metric_path"]]
     template["failure_signature"] = raw.get("failure_signature") or first_guardrail(
         research_context
     )
@@ -692,6 +704,7 @@ def collect_live_round_proposals(
             cooldowns,
             result_packet,
             research_context,
+            primary_proposal=exploit_raw,
         ),
     )
     guard = run_opencode_agent(
@@ -836,14 +849,38 @@ def tick(config_path: pathlib.Path, workspace: pathlib.Path, mode: str) -> dict:
             )
             return {"phase": "poll", "poll": polled}
         if polled["status"] == "failed":
-            session["active_run_id"] = active
+            judged = run_python(
+                "judge_result.py",
+                "--config",
+                str(config_path),
+                "--workspace",
+                str(workspace),
+                "--run-id",
+                active,
+                "--monitor-state",
+                polled["status"],
+                cwd=workspace,
+            )
+            research_context = {
+                "config_path": str(research_config_path(workspace)),
+                "config": load_research_config(research_config_path(workspace)),
+            }
+            record_research_feedback(workspace, research_context, judged)
+            session = load_session(session_file)
+            session["last_failed_task"] = active
+            session["active_dvc_task"] = None
             set_session_stage(session, "crash_recoverable", f"dvc task {active} failed")
             save_session(session_file, session)
             write_json(
                 status_file,
-                {"phase": "failed", "updated_at": now_iso(), "poll": polled},
+                {
+                    "phase": "failed",
+                    "updated_at": now_iso(),
+                    "poll": polled,
+                    "judge": judged,
+                },
             )
-            return {"phase": "failed", "poll": polled}
+            return {"phase": "failed", "poll": polled, "judge": judged}
         judged = run_python(
             "judge_result.py",
             "--config",
@@ -1071,6 +1108,7 @@ def main() -> None:
         "tick",
         "status",
         "resume",
+        "branch-from-checkpoint",
         "stop",
         "_run-controller",
     ]:
@@ -1138,7 +1176,7 @@ def main() -> None:
         emit_json(status)
         return
 
-    if args.command == "resume":
+    if args.command in {"resume", "branch-from-checkpoint"}:
         session = load_session(session_path(workspace))
         checkpoint = pathlib.Path(
             workspace / "experiments" / "recovery_checkpoint.json"
@@ -1151,22 +1189,37 @@ def main() -> None:
         if not payload or not payload.get("checkpoint_path"):
             emit_json({"resumed": False, "reason": "no_checkpoint"})
             return
-        round_selection = select_round_mutation(
-            workspace,
-            load_goal(config_path),
-            int(session.get("iteration_count", 0)) + 1,
-            args.mode,
-            collect_round_research_context(
+        if args.command == "resume":
+            failed_task = str(
+                session.get("last_failed_task") or payload.get("run_id") or ""
+            )
+            mutation = (
+                load_pending_result(workspace, failed_task) if failed_task else {}
+            )
+            if not mutation:
+                emit_json({"resumed": False, "reason": "no_failed_pending_result"})
+                return
+        else:
+            round_selection = select_round_mutation(
                 workspace,
                 load_goal(config_path),
                 int(session.get("iteration_count", 0)) + 1,
-            ),
-        )
-        mutation = round_selection.get("mutation", round_selection)
+                args.mode,
+                collect_round_research_context(
+                    workspace,
+                    load_goal(config_path),
+                    int(session.get("iteration_count", 0)) + 1,
+                ),
+            )
+            mutation = round_selection.get("mutation", round_selection)
         if mutation.get("review_blocked"):
             emit_json({"resumed": False, "reason": "review_blocked"})
             return
-        run_id = f"resume-{int(session.get('iteration_count', 0)) + 1:04d}"
+        run_id = (
+            f"resume-{int(session.get('iteration_count', 0)) + 1:04d}"
+            if args.command == "resume"
+            else f"branch-{int(session.get('iteration_count', 0)) + 1:04d}"
+        )
         candidate = run_python(
             "run_candidate.py",
             "--config",
@@ -1190,6 +1243,7 @@ def main() -> None:
         emit_json(
             {
                 "resumed": True,
+                "mode": args.command,
                 "candidate": candidate,
                 "resume_from": payload["checkpoint_path"],
             }

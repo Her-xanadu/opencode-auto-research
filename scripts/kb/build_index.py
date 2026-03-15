@@ -54,6 +54,7 @@ def build_indexes(
     *,
     scaffold_missing: bool,
     extract_claims: bool,
+    overwrite_claims: bool,
     config: Dict[str, Any],
 ) -> Dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -73,7 +74,9 @@ def build_indexes(
         if scaffold_missing:
             scaffold_figure_note(paths, meta)
         missing_fields = validate_meta(meta)
-        if extract_claims or not paths.claims.exists():
+        if (extract_claims and (overwrite_claims or not paths.claims.exists())) or (
+            not extract_claims and not paths.claims.exists()
+        ):
             claims = extract_claims_from_markdown(paths, meta)
             write_claims(paths.claims, claims)
         else:
@@ -125,6 +128,7 @@ def main() -> None:
     parser.add_argument("--config")
     parser.add_argument("--scaffold-missing", action="store_true")
     parser.add_argument("--extract-claims", action="store_true")
+    parser.add_argument("--overwrite-claims", action="store_true")
     args = parser.parse_args()
 
     workspace_root = resolve_workspace_root(args.workspace_root)
@@ -144,6 +148,7 @@ def main() -> None:
             output_dir,
             scaffold_missing=args.scaffold_missing,
             extract_claims=args.extract_claims,
+            overwrite_claims=args.overwrite_claims,
             config=config,
         )
     )

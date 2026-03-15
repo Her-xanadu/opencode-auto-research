@@ -118,7 +118,12 @@ def main() -> None:
     run_id = args.run_id or new_id("candidate")
     session = load_session(session_path(workspace))
     round_index = int(session.get("iteration_count", 0)) + 1
-    touched_files = mutation.get("files_to_touch") or [mutation.get("target_file")]
+    touched_files = (
+        mutation.get("files_to_touch")
+        or mutation.get("touched_files")
+        or [mutation.get("target_file")]
+    )
+    touched_files = [path for path in touched_files if path]
     save_parent_snapshot(workspace, run_id, touched_files)
     execution_result = (
         apply_mutation_live(workspace, mutation)
@@ -203,6 +208,11 @@ def main() -> None:
         "change_unit": mutation.get("change_unit"),
         "proposal_id": mutation.get("proposal_id"),
         "family": mutation.get("family"),
+        "target_file": mutation.get("target_file"),
+        "files_to_touch": touched_files,
+        "params": mutation.get("params", {}),
+        "why_not_parameter_only": mutation.get("why_not_parameter_only"),
+        "minimal_ablation": mutation.get("minimal_ablation"),
         "touched_files": touched_files,
         "diff_summary": execution_result.get(
             "diff_summary", mutation.get("change_unit")

@@ -52,6 +52,7 @@ def main() -> None:
         index_output_dir(workspace_root, config),
         scaffold_missing=True,
         extract_claims=False,
+        overwrite_claims=False,
         config=config,
     )
     emit_json(
