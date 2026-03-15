@@ -22,5 +22,6 @@ experiments/research/paper-id-map.jsonl
 dvclive/
 .DS_Store
 vault/
+vault
 *.log
 *.pyc

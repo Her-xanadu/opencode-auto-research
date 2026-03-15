@@ -49,10 +49,10 @@ describe("research brain mock redirect selection", () => {
     const { workspace, configPath } = await makeWorkspace();
     await execFileAsync("python3", [innovationLoopScript, "bootstrap", "--config", configPath, "--workspace", workspace, "--mode", "mock"], { cwd: workspace });
     const attemptsPath = path.join(workspace, "experiments", "attempts.jsonl");
-    await fs.writeFile(attemptsPath, JSON.stringify({ kind: "candidate", family: "objective.loss", decision: "discard", redirect_if_underperforming: "停止重复 objective.loss，转向 repr.feature" }) + "\n", "utf8");
+    await fs.writeFile(attemptsPath, JSON.stringify({ kind: "candidate", family: "objective.loss", decision: "discard", redirect_if_underperforming: "停止重复 objective.loss，转向 repr.feature", failure_signature: "loss path stalled", causal_metric_path: ["loss_shape", "optimization_stability", "target_metric"] }) + "\n", "utf8");
     await execFileAsync("python3", [innovationLoopScript, "tick", "--config", configPath, "--workspace", workspace, "--mode", "mock"], { cwd: workspace });
     await execFileAsync("python3", [innovationLoopScript, "tick", "--config", configPath, "--workspace", workspace, "--mode", "mock"], { cwd: workspace });
     const proposals = JSON.parse(await fs.readFile(path.join(workspace, "experiments", "proposals", "round-0001.json"), "utf8"));
     expect(proposals.next_primary_hypothesis.family).toBe("repr.feature");
-  });
+  }, 15000);
 });

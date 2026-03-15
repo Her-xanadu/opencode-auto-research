@@ -13,7 +13,7 @@ const innovationLoopScript = path.join(repoRoot, "scripts", "innovation_loop.py"
 const hasRealDvc = spawnSync("python3", ["-c", "import shutil,sys; sys.exit(0 if shutil.which('dvc') else 1)"], {
   cwd: repoRoot,
 }).status === 0;
-const describeIfRealDvc = hasRealDvc && process.env.RUN_REAL_DVC_TESTS === "1" ? describe : describe.skip;
+const describeIfRealDvc = hasRealDvc ? describe : describe.skip;
 
 async function makeWorkspace(): Promise<{ workspace: string; configPath: string }> {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), "auto-exp-python-controller-real-dvc-"));

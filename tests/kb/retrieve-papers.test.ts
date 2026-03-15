@@ -42,8 +42,11 @@ describe("kb retrieve papers", () => {
     expect(result.innovation_briefs.apollo.support_mech_id).toBeTruthy();
     expect(result.innovation_briefs.apollo.compatibility_score).toBeGreaterThan(0);
     expect(result.innovation_briefs.apollo.lead_unit.mechanism_verb).toBeTruthy();
+    expect(Array.isArray(result.innovation_briefs.apollo.causal_metric_path)).toBe(true);
+    expect(result.innovation_briefs.apollo.causal_metric_path.length).toBeGreaterThan(1);
     expect(result.innovation_briefs.athena.guardrails.length).toBeGreaterThan(0);
     expect(result.selected[0].mechanism_units.length).toBeGreaterThan(0);
+    expect(result.selected[0].metric_paths.length).toBeGreaterThan(0);
     expect(result.selected[0].mechanism_units[0].intervention).not.toContain("作者解决了什么问题");
     expect(result.selected[0].mechanism_units[0].intervention).not.toBe("1.");
     expect(result.selected[0].mechanism_units[0].action_sentence.startsWith("对")).toBe(true);

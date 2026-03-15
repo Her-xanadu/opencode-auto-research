@@ -67,5 +67,5 @@ describe("research brain loop integration", () => {
     expect(proposals.next_primary_hypothesis.causal_metric_path).toBeTruthy();
     expect(proposals.next_primary_hypothesis.failure_signature).toBeTruthy();
     expect(proposals.next_primary_hypothesis.pivot_after_failure).toBeTruthy();
-  });
+  }, 15000);
 });

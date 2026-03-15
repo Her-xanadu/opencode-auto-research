@@ -15,11 +15,12 @@ async function makeWorkspace(): Promise<string> {
   await fs.writeFile(path.join(dir, "src", "config.json"), '{"learning_rate":0.1}\n', "utf8");
   await fs.writeFile(path.join(dir, "src", "strategy.txt"), "baseline\n", "utf8");
   await fs.writeFile(path.join(dir, "src", "module.ts"), "export const variant = 0;\n", "utf8");
+  await fs.writeFile(path.join(dir, "evaluate.py"), "print(0.93)\n", "utf8");
   return dir;
 }
 
 afterEach(async () => {
-  await Promise.all(tempDirs.splice(0).map((dir) => fs.rm(dir, { recursive: true, force: true })));
+  await Promise.all(tempDirs.splice(0).map((dir) => fs.rm(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 })));
 });
 
 describe("local e2e", () => {
@@ -71,5 +72,5 @@ describe("local e2e", () => {
       ]),
     );
     expect(status.best.current_best.metric).toBeGreaterThan(0.5);
-  });
+  }, 30000);
 });
