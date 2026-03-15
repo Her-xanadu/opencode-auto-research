@@ -724,8 +724,10 @@ def collect_live_round_proposals(
         "Athena": "approved the exploit proposal",
         "Hermes": "kept as fallback while exploit remained valid",
     }
-    if str(guard.get("verdict", "approve")).lower() != "approve" or not bool(
-        guard.get("single_change_ok", False)
+    if (
+        str(guard.get("verdict", "approve")).lower() != "approve"
+        or not bool(guard.get("single_change_ok", False))
+        or not bool(guard.get("paper_support_ok", False))
     ):
         chosen = divergence
         reject_reasons = {

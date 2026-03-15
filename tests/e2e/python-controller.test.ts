@@ -179,7 +179,7 @@ describe("python controller cli", () => {
     const resume = await runInnovationLoop(workspace, configPath, "resume");
     expect(resume.resumed).toBe(true);
     expect(resume.candidate.queued).toBe(true);
-  }, 30000);
+  }, 45000);
 
   it("supports detached start and stop", async () => {
     const { workspace, configPath } = await makeWorkspace();

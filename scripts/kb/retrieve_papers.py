@@ -433,6 +433,7 @@ def main() -> None:
     parser.add_argument("--session", required=True)
     parser.add_argument("--best", required=True)
     parser.add_argument("--attempts", required=False)
+    parser.add_argument("--result-packet")
     parser.add_argument("--workspace-root")
     parser.add_argument("--index-dir")
     parser.add_argument("--config")
@@ -455,6 +456,11 @@ def main() -> None:
     attempts = (
         read_jsonl(pathlib.Path(args.attempts).resolve()) if args.attempts else []
     )
+    result_packet = (
+        load_structured(pathlib.Path(args.result_packet).resolve())
+        if args.result_packet
+        else {}
+    )
     posterior = read_json(posterior_rank_output_path(workspace_root, config), {})
     papers = load_jsonl(index_dir / "paper-index.jsonl")
 
@@ -464,6 +470,13 @@ def main() -> None:
                 str(goal.get("goal_text") or ""),
                 str(goal.get("target_metric") or ""),
                 str(best.get("family") or ""),
+                str(result_packet.get("change_class") or ""),
+                str(result_packet.get("change_unit") or ""),
+                str((result_packet.get("monitor_summary") or {}).get("state") or ""),
+                str(
+                    (result_packet.get("change_manifest") or {}).get("primary_object")
+                    or ""
+                ),
                 " ".join(
                     str(item.get("failure_signature") or "")
                     for item in attempts[-5:]
