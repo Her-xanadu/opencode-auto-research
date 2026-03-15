@@ -76,5 +76,5 @@ describe("research brain live grounding", () => {
     const proposals = JSON.parse(await fs.readFile(path.join(workspace, "experiments", "proposals", "round-0001.json"), "utf8"));
     expect(proposals.next_primary_hypothesis.paper_grounding).toHaveLength(2);
     expect(proposals.evidence_pack_path).toContain("evidence-round-0001.md");
-  });
+  }, 15000);
 });

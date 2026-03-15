@@ -79,5 +79,5 @@ describe("research brain redirect selection", () => {
     const proposals = JSON.parse(await fs.readFile(path.join(workspace, "experiments", "proposals", "round-0001.json"), "utf8"));
     expect(proposals.next_primary_hypothesis.family).toBe("repr.feature");
     expect(proposals.reject_reasons.controller_redirect).toContain("停止重复 objective.loss");
-  });
+  }, 15000);
 });

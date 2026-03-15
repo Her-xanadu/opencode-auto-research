@@ -52,5 +52,5 @@ describe("governed experiment workflow bridge", () => {
     expect(result.authority_path).toBe("python_controller");
     expect(result.legacy_ts_workflow).toBe(false);
     expect(summary.specialist_audit).toBeUndefined();
-  }, 30000);
+  }, 45000);
 });

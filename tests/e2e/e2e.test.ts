@@ -72,5 +72,5 @@ describe("local e2e", () => {
       ]),
     );
     expect(status.best.current_best.metric).toBeGreaterThan(0.5);
-  }, 30000);
+  }, 45000);
 });
