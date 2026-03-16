@@ -623,6 +623,25 @@ Context:
 def materialize_live_choice(
     raw: dict, round_index: int, research_context: dict, role: str
 ) -> dict:
+    def parse_expected_gain(value: object) -> float:
+        if isinstance(value, (int, float)):
+            return float(value)
+        text = str(value or "").strip()
+        if not text:
+            return 0.02
+        import re
+
+        numbers = re.findall(r"-?\d+(?:\.\d+)?", text)
+        if not numbers:
+            return 0.02
+        values = [float(item) for item in numbers]
+        estimate = (
+            values[0] if len(values) == 1 else sum(values[:2]) / min(2, len(values))
+        )
+        if "%" in text:
+            estimate /= 100.0
+        return estimate
+
     choice = str(raw.get("choice", "objective"))
     templates = {item["change_class"]: item for item in candidate_mutation_templates()}
     if choice not in templates:
@@ -632,7 +651,7 @@ def materialize_live_choice(
     template["title"] = raw.get("title") or template["change_unit"]
     template["innovation_tags"] = raw.get("innovation_tags") or [choice]
     template["mechanism"] = raw.get("mechanism") or "selected exploit recipe"
-    template["expected_gain"] = float(raw.get("expected_gain", 0.02))
+    template["expected_gain"] = parse_expected_gain(raw.get("expected_gain", 0.02))
     template["risk"] = str(raw.get("risk", "low"))
     template["why_not_parameter_only"] = raw.get(
         "why_not_parameter_only"
@@ -872,6 +891,8 @@ def tick(config_path: pathlib.Path, workspace: pathlib.Path, mode: str) -> dict:
             }
             record_research_feedback(workspace, research_context, judged)
             session = load_session(session_file)
+            session["iteration_count"] = int(session.get("iteration_count", 0)) + 1
+            session["round"] = int(session["iteration_count"])
             session["last_failed_task"] = active
             session["active_dvc_task"] = None
             set_session_stage(session, "crash_recoverable", f"dvc task {active} failed")
@@ -904,6 +925,8 @@ def tick(config_path: pathlib.Path, workspace: pathlib.Path, mode: str) -> dict:
         }
         record_research_feedback(workspace, research_context, judged)
         session = load_session(session_file)
+        session["iteration_count"] = int(session.get("iteration_count", 0)) + 1
+        session["round"] = int(session["iteration_count"])
         if judged["status"] == "keep" and current_best_metric(workspace) is not None:
             if float(current_best_metric(workspace) or 0.0) >= float(
                 goal.get("target_threshold") or 0.0
