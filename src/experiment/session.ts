@@ -1,5 +1,4 @@
 import type { infer as ZodInfer } from "zod";
-import { syncSessionArtifact } from "../compat/artifacts";
 import { controllerSessionSchema } from "../controller/schema";
 import { readJson, writeJson } from "../utils/fs";
 import { createId } from "../utils/ids";
@@ -41,5 +40,4 @@ export async function loadSession(workspaceRoot: string): Promise<ExperimentSess
 export async function saveSession(workspaceRoot: string, session: ExperimentSession): Promise<void> {
   const parsed = experimentSessionSchema.parse(session);
   await writeJson(getSessionPath(workspaceRoot), parsed);
-  await syncSessionArtifact(workspaceRoot, parsed);
 }

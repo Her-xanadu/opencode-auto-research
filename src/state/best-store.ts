@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { syncBestArtifact } from "../compat/artifacts";
 import { readJson, writeJson } from "../utils/fs";
 import { getBestPath } from "../utils/paths";
 import { nowIso } from "../utils/time";
@@ -52,7 +51,6 @@ export class BestStoreManager {
   async save(value: BestStore): Promise<BestStore> {
     const parsed = bestStoreSchema.parse({ ...value, updated_at: nowIso() });
     await writeJson(getBestPath(this.workspaceRoot), parsed);
-    await syncBestArtifact(this.workspaceRoot, parsed);
     return parsed;
   }
 }

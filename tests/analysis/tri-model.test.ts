@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import resultPacket from "../../fixtures/results/result-packet-good.json";
+import resultPacket from "../../fixtures/results/result_packet-good.json";
 import { runTriModelAnalysis } from "../../src/analysis/tri-model";
 import type { ResultPacket } from "../../src/analysis/result-packet";
 

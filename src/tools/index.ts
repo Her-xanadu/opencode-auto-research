@@ -2,7 +2,7 @@ import { tool, type PluginInput, type ToolDefinition } from "../opencode-plugin"
 import { aggregateProposals } from "../analysis/aggregator";
 import { resultPacketSchema } from "../analysis/result-packet";
 import { runTriModelAnalysis } from "../analysis/tri-model";
-import { syncGoalArtifact, syncProposalCardArtifact } from "../compat/artifacts";
+import { syncGoalArtifact } from "../compat/artifacts";
 import { buildSession, loadSession, saveSession } from "../experiment/session";
 import { prepareDockerSandbox } from "../sandbox/docker-runner";
 import { sandboxPreparationSchema } from "../sandbox/schema";
@@ -210,7 +210,6 @@ export const experiment_run_analysis: ToolDefinition = tool({
     const cards = runTriModelAnalysis(packet);
     for (const card of cards) {
       await appendJsonl(getProposalCardsPath(workspaceRoot), card);
-      await syncProposalCardArtifact(workspaceRoot, card);
     }
     return stringify(aggregateProposals(cards));
   },

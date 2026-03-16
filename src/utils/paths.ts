@@ -100,11 +100,11 @@ export function getRunEventsPath(workspaceRoot: string, runId: string): string {
 }
 
 export function getRecoveryJournalPath(workspaceRoot: string): string {
-  return path.join(getExperimentRoot(workspaceRoot), "recovery-journal.jsonl");
+  return path.join(getExperimentRoot(workspaceRoot), "recovery_journal.jsonl");
 }
 
 export function getRecoveryCheckpointPath(workspaceRoot: string): string {
-  return path.join(getExperimentRoot(workspaceRoot), "recovery-checkpoint.json");
+  return path.join(getExperimentRoot(workspaceRoot), "recovery_checkpoint.json");
 }
 
 export function resolveWorkspaceRoot(workspaceRoot?: string): string {

@@ -1,4 +1,3 @@
-import { syncAttemptArtifact, syncBestArtifact, syncRunEventArtifact } from "../compat/artifacts";
 import { appendJsonl, writeJson } from "../utils/fs";
 import { getBestPath, getResultPacketPath, getRunEventsPath, getRunsPath } from "../utils/paths";
 import { nowIso } from "../utils/time";
@@ -36,7 +35,6 @@ async function writeRunEvent(
     payload,
   };
   await appendJsonl(getRunEventsPath(workspaceRoot, runId), event);
-  await syncRunEventArtifact(workspaceRoot, runId, event);
 }
 
 export async function executeIteration(input: {
@@ -97,7 +95,6 @@ export async function executeIteration(input: {
     status: decision.status,
   };
   await appendJsonl(getRunsPath(input.workspaceRoot), record);
-  await syncAttemptArtifact(input.workspaceRoot, record);
   if (decision.status === "keep") {
     const best = {
       current_best: { run_id: runId, metric: currentMetric, commit: "local", checkpoint: null },
@@ -106,7 +103,6 @@ export async function executeIteration(input: {
       updated_at: nowIso(),
     };
     await writeJson(getBestPath(input.workspaceRoot), best);
-    await syncBestArtifact(input.workspaceRoot, best);
   }
   return {
     run_id: runId,

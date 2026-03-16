@@ -21,6 +21,7 @@ from ae_common import (
     run_dir,
     run_stage,
     restore_parent_snapshot,
+    read_json,
     save_parent_snapshot,
     save_run_manifest,
     save_pending_result,
@@ -144,6 +145,23 @@ def main() -> None:
             "parent_run_id": current_best_exp_ref(workspace) or "baseline",
         },
     )
+    parent_snapshot = read_json(
+        workspace / "experiments" / "runs" / run_id / "parent_snapshot.json", {}
+    )
+    created_files = [
+        relative
+        for relative, entry in parent_snapshot.items()
+        if isinstance(entry, dict)
+        and not entry.get("exists", False)
+        and (workspace / relative).exists()
+    ]
+    deleted_files = [
+        relative
+        for relative, entry in parent_snapshot.items()
+        if isinstance(entry, dict)
+        and entry.get("exists", False)
+        and not (workspace / relative).exists()
+    ]
     save_run_manifest(
         workspace,
         run_id,
@@ -152,8 +170,8 @@ def main() -> None:
             "proposal_id": mutation.get("proposal_id"),
             "family": mutation.get("family"),
             "touched_files": touched_files,
-            "created_files": [],
-            "deleted_files": [],
+            "created_files": created_files,
+            "deleted_files": deleted_files,
             "checkpoint_path": str(checkpoint),
             "dvc_exp_ref": run_id,
             "resume_from": args.resume_from,

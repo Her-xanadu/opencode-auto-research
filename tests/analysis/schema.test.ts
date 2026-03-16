@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import resultPacket from "../../fixtures/results/result-packet-good.json";
+import resultPacket from "../../fixtures/results/result_packet-good.json";
 import { proposalCardSchema, proposalContractSchema } from "../../src/analysis/proposal-card";
 import { controllerSessionSchema, controllerResearchContextSchema, resultPacketSchema } from "../../src/analysis/result-packet";
 import { controllerEvidenceMetadataSchema, controllerRetrievalResultSchema } from "../../src/controller/schema";

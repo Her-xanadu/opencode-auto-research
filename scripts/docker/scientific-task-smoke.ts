@@ -13,13 +13,13 @@ import {
 } from "../../src/tools";
 import { pathExists, readJsonl } from "../../src/utils/fs";
 import {
-  getCompatAttemptsPath,
-  getCompatBestPath,
   getCompatGoalPath,
-  getCompatProposalCardsPath,
-  getCompatSessionPath,
+  getBestPath,
   getOrchestrationSummaryPath,
   getOrchestrationTracePath,
+  getProposalCardsPath,
+  getRunsPath,
+  getSessionPath,
 } from "../../src/utils/paths";
 
 async function writeToyResearchWorkspace(workspaceRoot: string): Promise<void> {
@@ -97,13 +97,13 @@ async function main() {
   const acceptance = JSON.parse(await experiment_acceptance_review.execute({ workspace_root: workspaceRoot }));
 
   const trace = await readJsonl<{ actor: string }>(getOrchestrationTracePath(workspaceRoot));
-  const attempts = await readJsonl<{ run_id: string; current_metric: number; status: string }>(getCompatAttemptsPath(workspaceRoot));
-  const proposalCards = await readJsonl(getCompatProposalCardsPath(workspaceRoot));
+  const attempts = await readJsonl<{ run_id: string; current_metric: number; status: string }>(getRunsPath(workspaceRoot));
+  const proposalCards = await readJsonl(getProposalCardsPath(workspaceRoot));
 
   const artifactPresence = {
     compat_goal: await pathExists(getCompatGoalPath(workspaceRoot)),
-    compat_session: await pathExists(getCompatSessionPath(workspaceRoot)),
-    compat_best: await pathExists(getCompatBestPath(workspaceRoot)),
+    session: await pathExists(getSessionPath(workspaceRoot)),
+    best: await pathExists(getBestPath(workspaceRoot)),
     orchestration_summary: await pathExists(getOrchestrationSummaryPath(workspaceRoot)),
   };
 
@@ -125,7 +125,7 @@ async function main() {
       throw new Error(`missing orchestration actor: ${expectedActor}`);
     }
   }
-  if (!artifactPresence.compat_goal || !artifactPresence.compat_session || !artifactPresence.compat_best || !artifactPresence.orchestration_summary) {
+  if (!artifactPresence.compat_goal || !artifactPresence.session || !artifactPresence.best || !artifactPresence.orchestration_summary) {
     throw new Error(`artifact presence check failed: ${JSON.stringify(artifactPresence)}`);
   }
 

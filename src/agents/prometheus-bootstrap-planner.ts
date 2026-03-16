@@ -1,6 +1,5 @@
 export const prometheusBootstrapPlannerAgent = {
   mode: "primary",
-  model: "openai/gpt-5.4",
   color: "#FF5722",
   description: "Prometheus override used only for bootstrap and review-blocked replanning.",
   permission: {

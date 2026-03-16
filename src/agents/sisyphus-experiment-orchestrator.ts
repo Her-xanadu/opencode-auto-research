@@ -1,6 +1,5 @@
 export const sisyphusExperimentOrchestratorAgent = {
   mode: "primary",
-  model: "openai/gpt-5.4",
   color: "#00CED1",
   description: "Sisyphus override for the fixed experiment loop orchestrator.",
   permission: {
