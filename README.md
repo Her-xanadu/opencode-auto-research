@@ -1,6 +1,8 @@
-# OpenCode Auto Experiment
+[English](./README.md) | [简体中文](./README.zh-CN.md)
 
-OpenCode Auto Experiment is an experiment-optimization loop for OpenCode + oh-my-opencode.
+# OpenCode Auto Research
+
+OpenCode Auto Research is a governed autonomous experimentation framework with a local innovation brain for OpenCode + oh-my-opencode.
 
 It is designed for research and engineering workflows where you want an outer orchestrator to:
 
@@ -144,6 +146,12 @@ python3 -m pip install "dvc>=3,<4" "dvclive>=3,<4"
 npm install -g opencode-ai oh-my-opencode
 ```
 
+Or use the local bootstrap script:
+
+```bash
+bash scripts/install-local.sh
+```
+
 ### 5. Configure environment variables
 
 Copy the example file:
@@ -156,6 +164,8 @@ Then set the required values for your model provider. For the current default Ki
 
 - `KIMI_CODING_API_KEY`
 - `KIMI_CODING_BASE_URL`
+
+For a fuller installation and upgrade workflow, see `INSTALL.md`.
 
 ## Configuration
 

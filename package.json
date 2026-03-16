@@ -1,6 +1,6 @@
 {
   "name": "opencode-auto-research",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Governed autonomous experiment loop with a local innovation brain.",
   "type": "module",
   "main": "dist/index.js",
