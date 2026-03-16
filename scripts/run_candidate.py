@@ -172,6 +172,14 @@ def main() -> None:
             "touched_files": touched_files,
             "created_files": created_files,
             "deleted_files": deleted_files,
+            "artifact_files": [
+                str(path.relative_to(workspace))
+                for path in [
+                    checkpoint,
+                    workspace / "experiments" / "metrics.json",
+                ]
+                if path.exists()
+            ],
             "checkpoint_path": str(checkpoint),
             "dvc_exp_ref": run_id,
             "resume_from": args.resume_from,

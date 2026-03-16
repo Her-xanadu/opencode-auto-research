@@ -1056,7 +1056,15 @@ def save_parent_snapshot(
 
 
 def restore_parent_snapshot(workspace: pathlib.Path, run_id: str) -> None:
+    manifest = read_json(run_dir(workspace, run_id) / "meta.json", {})
+    required = ["touched_files", "created_files", "deleted_files", "artifact_files"]
+    if manifest and not all(key in manifest for key in required):
+        raise RuntimeError(f"incomplete run manifest for {run_id}")
     snapshot = read_json(run_dir(workspace, run_id) / "parent_snapshot.json", {})
+    for relative in manifest.get("artifact_files", []) if manifest else []:
+        (workspace / relative).unlink(missing_ok=True)
+    for relative in manifest.get("created_files", []) if manifest else []:
+        (workspace / relative).unlink(missing_ok=True)
     for relative, entry in snapshot.items():
         absolute = workspace / relative
         if isinstance(entry, dict):
@@ -1071,7 +1079,12 @@ def restore_parent_snapshot(workspace: pathlib.Path, run_id: str) -> None:
 def save_run_manifest(
     workspace: pathlib.Path, run_id: str, payload: Dict[str, Any]
 ) -> None:
-    write_json(run_dir(workspace, run_id) / "meta.json", payload)
+    manifest = dict(payload)
+    manifest.setdefault("touched_files", [])
+    manifest.setdefault("created_files", [])
+    manifest.setdefault("deleted_files", [])
+    manifest.setdefault("artifact_files", [])
+    write_json(run_dir(workspace, run_id) / "meta.json", manifest)
 
 
 def load_pending_result(workspace: pathlib.Path, run_id: str) -> Dict[str, Any]:

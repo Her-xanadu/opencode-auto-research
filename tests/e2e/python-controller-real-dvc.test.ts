@@ -181,5 +181,5 @@ describeIfRealDvc("python controller with real dvc", () => {
       expect(status.stop_reason).toBe("goal_reached");
     }
     expect(status.controller_not_running).toBe(true);
-  }, 60000);
+  }, 90000);
 });

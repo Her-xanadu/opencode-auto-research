@@ -1202,8 +1202,18 @@ def main() -> None:
                 load_pending_result(workspace, failed_task) if failed_task else {}
             )
             if not mutation:
-                emit_json({"resumed": False, "reason": "no_failed_pending_result"})
-                return
+                round_selection = select_round_mutation(
+                    workspace,
+                    load_goal(config_path),
+                    int(session.get("iteration_count", 0)) + 1,
+                    args.mode,
+                    collect_round_research_context(
+                        workspace,
+                        load_goal(config_path),
+                        int(session.get("iteration_count", 0)) + 1,
+                    ),
+                )
+                mutation = round_selection.get("mutation", round_selection)
         else:
             round_selection = select_round_mutation(
                 workspace,

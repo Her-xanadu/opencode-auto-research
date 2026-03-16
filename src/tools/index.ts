@@ -199,7 +199,7 @@ export const experiment_acceptance_review: ToolDefinition = tool({
   },
 });
 
-export const experiment_run_analysis: ToolDefinition = tool({
+const experiment_run_analysis: ToolDefinition = tool({
   description: "Internal/test-only legacy tri-model placeholder analysis for the current result packet.",
   args: {
     workspace_root: tool.schema.string().optional(),

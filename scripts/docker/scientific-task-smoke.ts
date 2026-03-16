@@ -15,10 +15,10 @@ import { resultPacketSchema } from "../../src/analysis/result-packet";
 import { runTriModelAnalysis } from "../../src/analysis/tri-model";
 import { pathExists, readJson, readJsonl } from "../../src/utils/fs";
 import {
-  getCompatGoalPath,
   getBestPath,
   getOrchestrationSummaryPath,
   getOrchestrationTracePath,
+  getWorkspaceConfigPath,
   getResultPacketPath,
   getProposalCardsPath,
   getRunsPath,
@@ -105,7 +105,7 @@ async function main() {
   const proposalCards = await readJsonl(getProposalCardsPath(workspaceRoot));
 
   const artifactPresence = {
-    compat_goal: await pathExists(getCompatGoalPath(workspaceRoot)),
+    workspace_config: await pathExists(getWorkspaceConfigPath(workspaceRoot)),
     session: await pathExists(getSessionPath(workspaceRoot)),
     best: await pathExists(getBestPath(workspaceRoot)),
     orchestration_summary: await pathExists(getOrchestrationSummaryPath(workspaceRoot)),
@@ -129,7 +129,7 @@ async function main() {
       throw new Error(`missing orchestration actor: ${expectedActor}`);
     }
   }
-  if (!artifactPresence.compat_goal || !artifactPresence.session || !artifactPresence.best || !artifactPresence.orchestration_summary) {
+  if (!artifactPresence.workspace_config || !artifactPresence.session || !artifactPresence.best || !artifactPresence.orchestration_summary) {
     throw new Error(`artifact presence check failed: ${JSON.stringify(artifactPresence)}`);
   }
 

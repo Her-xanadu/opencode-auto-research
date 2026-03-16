@@ -37,7 +37,7 @@ This repository provides a governed experiment loop with these core pieces:
 Authority-path note:
 
 - `scripts/innovation_loop.py` is the only outer-loop authority path.
-- TypeScript orchestration code remains only as a legacy compatibility layer for tests and older tool surfaces.
+- TypeScript legacy orchestration remains only as internal/test-only compatibility code.
 - `experiment_run_governed_workflow` now bridges into the Python controller instead of running a competing TS outer loop.
 
 The control flow is:
