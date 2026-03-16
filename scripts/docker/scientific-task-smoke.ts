@@ -10,17 +10,13 @@ import {
   experiment_status,
   experiment_validate_spec,
 } from "../../src/tools";
-import { aggregateProposals } from "../../src/analysis/aggregator";
-import { resultPacketSchema } from "../../src/analysis/result-packet";
-import { runTriModelAnalysis } from "../../src/analysis/tri-model";
 import { pathExists, readJson, readJsonl } from "../../src/utils/fs";
 import {
   getBestPath,
   getOrchestrationSummaryPath,
   getOrchestrationTracePath,
+  getExperimentRoot,
   getWorkspaceConfigPath,
-  getResultPacketPath,
-  getProposalCardsPath,
   getRunsPath,
   getSessionPath,
 } from "../../src/utils/paths";
@@ -95,14 +91,13 @@ async function main() {
   );
   const planned = JSON.parse(await experiment_plan_or_resume.execute({ workspace_root: workspaceRoot }));
   const workflow = JSON.parse(await experiment_run_governed_workflow.execute({ workspace_root: workspaceRoot }));
-  const packet = resultPacketSchema.parse(await readJson(getResultPacketPath(workspaceRoot), null));
-  const analysis = aggregateProposals(runTriModelAnalysis(packet));
   const status = JSON.parse(await experiment_status.execute({ workspace_root: workspaceRoot }));
   const acceptance = JSON.parse(await experiment_acceptance_review.execute({ workspace_root: workspaceRoot }));
 
   const trace = await readJsonl<{ actor: string }>(getOrchestrationTracePath(workspaceRoot));
   const attempts = await readJsonl<{ run_id: string; current_metric: number; status: string }>(getRunsPath(workspaceRoot));
-  const proposalCards = await readJsonl(getProposalCardsPath(workspaceRoot));
+  const roundOneProposalPath = path.join(getExperimentRoot(workspaceRoot), "proposals", "round-0001.json");
+  const roundOneProposal = await readJson(roundOneProposalPath, null);
 
   const artifactPresence = {
     workspace_config: await pathExists(getWorkspaceConfigPath(workspaceRoot)),
@@ -149,14 +144,14 @@ async function main() {
           latest_decision: workflow.latest_decision,
           active_run_id: workflow.active_run_id,
         },
-        analysis,
         acceptance,
         artifacts: {
           ...artifactPresence,
           attempts_count: attempts.length,
-          proposal_cards_count: proposalCards.length,
+          proposal_round_available: roundOneProposal !== null,
           trace_actors: trace.map((step) => step.actor),
         },
+        round_one_proposal: roundOneProposal,
         best_run: status.best?.current_best ?? null,
         attempts,
       },

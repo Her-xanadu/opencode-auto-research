@@ -1,5 +1,6 @@
 export const hermesDivergenceScoutAgent = {
   mode: "subagent",
+  model: "openai/gpt-5.4",
   description: "Divergence scout that proposes orthogonal, still-measurable alternatives.",
   prompt:
     `You are Hermes, the divergence scout for experiment search.

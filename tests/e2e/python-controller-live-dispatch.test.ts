@@ -100,10 +100,21 @@ with log_path.open("a", encoding="utf-8") as handle:
     handle.write(json.dumps(args) + "\\n")
 
 agent = None
+prompt = args[-1] if args else ""
 for index, value in enumerate(args):
     if value == "--agent" and index + 1 < len(args):
         agent = args[index + 1]
         break
+
+if agent is None:
+    if "@Apollo" in prompt:
+        agent = "Apollo"
+    elif "@Athena" in prompt:
+        agent = "Athena"
+    elif "@Hermes" in prompt:
+        agent = "Hermes"
+    elif "@sisyphus-junior" in prompt:
+        agent = "sisyphus-junior"
 
 if agent == "Apollo":
     print(json.dumps({
@@ -242,10 +253,10 @@ describe("python controller live dispatch", () => {
 
     const logs = (await fs.readFile(logPath, "utf8")).trim().split("\n").filter(Boolean).map((line) => JSON.parse(line));
     const rendered = logs.map((entry: string[]) => entry.join(" ")).join("\n");
-    expect(rendered).toContain("--agent Apollo");
-    expect(rendered).toContain("--agent Athena");
-    expect(rendered).toContain("--agent Hermes");
-    expect(rendered).toContain("--agent sisyphus-junior");
+    expect(rendered).toContain("@Apollo");
+    expect(rendered).toContain("@Athena");
+    expect(rendered).toContain("@Hermes");
+    expect(rendered).toContain("@sisyphus-junior");
 
     const proposalsRound1 = JSON.parse(await fs.readFile(path.join(workspace, "experiments", "proposals", "round-0001.json"), "utf8"));
     expect(proposalsRound1.next_primary_hypothesis.family).toBe("objective.loss");

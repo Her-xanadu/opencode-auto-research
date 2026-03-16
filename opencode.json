@@ -11,13 +11,13 @@
       "model": "kimi-for-coding/kimi-k2.5"
     },
     "Apollo": {
-      "model": "kimi-for-coding/kimi-k2.5"
+      "model": "github-copilot/claude opus 4.6"
     },
     "Athena": {
-      "model": "kimi-for-coding/kimi-k2.5"
+      "model": "github-copilot/gemini-3.1-pro-preview"
     },
     "Hermes": {
-      "model": "kimi-for-coding/kimi-k2.5"
+      "model": "openai/gpt-5.4"
     }
   }
 }

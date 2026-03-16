@@ -1,8 +1,6 @@
-[English](./README.md) | [简体中文](./README.zh-CN.md)
+# OpenCode Auto Experiment
 
-# OpenCode Auto Research
-
-OpenCode Auto Research is a governed autonomous experimentation framework with a local innovation brain for OpenCode + oh-my-opencode.
+OpenCode Auto Experiment is an experiment-optimization loop for OpenCode + oh-my-opencode.
 
 It is designed for research and engineering workflows where you want an outer orchestrator to:
 
@@ -152,6 +150,12 @@ Or use the local bootstrap script:
 bash scripts/install-local.sh
 ```
 
+To make the experiment system available from any plain `opencode` session, also install the global command set:
+
+```bash
+bash scripts/install-opencode-global.sh
+```
+
 ### 5. Configure environment variables
 
 Copy the example file:
@@ -165,7 +169,7 @@ Then set the required values for your model provider. For the current default Ki
 - `KIMI_CODING_API_KEY`
 - `KIMI_CODING_BASE_URL`
 
-For a fuller installation and upgrade workflow, see `INSTALL.md`.
+For a fuller setup and upgrade workflow, including global slash-command installation, see `INSTALL.md`.
 
 ## Configuration
 

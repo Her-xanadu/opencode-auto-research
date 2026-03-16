@@ -29,7 +29,10 @@ async function makeWorkspace(): Promise<{ workspace: string; configPath: string;
   await fs.writeFile(path.join(fakeBin, "opencode"), `#!/usr/bin/env python3
 import sys
 args = sys.argv[1:]
+prompt = args[-1] if args else ""
 agent = args[args.index("--agent") + 1] if "--agent" in args else None
+if agent is None and "@Apollo" in prompt:
+    agent = "Apollo"
 if agent == "Apollo":
     print("not-json-response")
 else:

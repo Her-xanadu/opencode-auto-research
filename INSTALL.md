@@ -34,12 +34,40 @@ Fill in:
 - `KIMI_CODING_BASE_URL`
 - optionally `INNOVATION_LOOP_AGENT_MODEL`
 
+If you use mixed providers for specialists, also configure the provider credentials required by your local OpenCode setup (for example OpenAI and GitHub Copilot tokens).
+
 ### 5. Verify installation
 
 ```bash
 npm run build
 npm test
 npm run test:smoke
+```
+
+## Global OpenCode slash-command install
+
+If you want to open plain `opencode` from any terminal directory and still trigger this system through slash commands, install the global integration layer:
+
+```bash
+bash scripts/install-opencode-global.sh
+```
+
+This installs:
+
+- user-level command files into `~/.config/opencode/commands/`
+- the `research-brain` skill into `~/.config/opencode/skills/`
+
+After installation, you can open `opencode` anywhere and use:
+
+- `/experiment-init`
+- `/experiment-status`
+- `/research-context`
+- `/innovate-loop`
+
+To remove the global integration:
+
+```bash
+bash scripts/uninstall-opencode-global.sh
 ```
 
 ## Recommended Local Usage
@@ -85,6 +113,7 @@ npm test -- tests/e2e/python-controller-real-dvc.test.ts
 ```
 
 5. Do not change `opencode.json` and agent model wiring casually during the same upgrade as controller logic.
+6. Keep a known-good specialist mapping in `opencode.json` and only upgrade one provider surface at a time when debugging upstream changes.
 
 ## Safe Upgrade Workflow
 

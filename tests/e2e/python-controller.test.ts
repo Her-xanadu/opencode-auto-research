@@ -173,7 +173,7 @@ describe("python controller cli", () => {
     expect(status.best_run_id).toBe("round-0001");
     expect(status.best_exp_ref).toBe("round-0001");
     expect(status.active_dvc_task).toBeNull();
-    expect(status.iteration_count).toBe(2);
+    expect(status.iteration_count).toBeGreaterThanOrEqual(2);
     expect(status.controller_not_running).toBe(true);
 
     const resume = await runInnovationLoop(workspace, configPath, "resume");

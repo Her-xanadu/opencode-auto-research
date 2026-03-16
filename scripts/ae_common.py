@@ -733,6 +733,8 @@ def run_opencode_agent(
     workspace: Optional[pathlib.Path] = None,
 ) -> Dict[str, Any]:
     repo_dir = opencode_repo_dir()
+    dispatch_agent = agent
+    dispatch_prompt = prompt
     command = [
         "opencode",
         "run",
@@ -741,10 +743,19 @@ def run_opencode_agent(
         "--format",
         "default",
     ]
+    subagent_names = {"Apollo", "Athena", "Hermes", "sisyphus-junior"}
     if os.environ.get("INNOVATION_LOOP_LIVE_TEST_MODE") != "1":
-        command.extend(["--agent", agent])
-    command.extend(["-m", model or opencode_agent_model()])
-    command.append(prompt)
+        if agent in subagent_names:
+            dispatch_prompt = (
+                f"@{agent}\n"
+                f"Return only the subagent's final JSON object with no extra commentary.\n\n"
+                f"Task:\n{prompt}"
+            )
+        elif dispatch_agent:
+            command.extend(["--agent", dispatch_agent])
+    if model is not None:
+        command.extend(["-m", model])
+    command.append(dispatch_prompt)
     result = run_process(
         command, repo_dir, check=False, timeout=max(timeout / 1000.0, 1.0)
     )

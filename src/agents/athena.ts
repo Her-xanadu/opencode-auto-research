@@ -1,5 +1,6 @@
 export const athenaValidityGuardAgent = {
   mode: "subagent",
+  model: "github-copilot/gemini-3.1-pro-preview",
   description: "Methodology guard that vetoes noisy, invalid, or un-attributable proposals.",
   prompt:
     `You are Athena, the methodological and attribution guard.

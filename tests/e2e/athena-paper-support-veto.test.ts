@@ -31,7 +31,17 @@ async function makeWorkspace(): Promise<{ workspace: string; configPath: string;
     `#!/usr/bin/env python3
 import json, sys
 args = sys.argv[1:]
+prompt = args[-1] if args else ""
 agent = args[args.index("--agent") + 1] if "--agent" in args else None
+if agent is None:
+    if "@Apollo" in prompt:
+        agent = "Apollo"
+    elif "@Athena" in prompt:
+        agent = "Athena"
+    elif "@Hermes" in prompt:
+        agent = "Hermes"
+    elif "@sisyphus-junior" in prompt:
+        agent = "sisyphus-junior"
 if agent == "Apollo":
     print(json.dumps({"choice":"objective","title":"weak-support","family":"objective.loss","innovation_tags":["objective"],"mechanism":"对目标函数做正则化，预期先改善中间稳定性指标，再影响目标指标。","files_to_touch":["src/config.json"],"expected_gain":0.02,"risk":"low","why_not_parameter_only":"changes objective family","minimal_ablation":["revert objective"],"paper_grounding":[{"paper_id":"doi:10.1145/3718958.3750493"},{"paper_id":"doi:10.1145/3711896.3736964"}],"redirect_if_underperforming":"切换到表征路线","causal_metric_path":["loss_shape","optimization_stability","target_metric"],"failure_signature":"loss path stalled","pivot_after_failure":"repr.feature"}))
 elif agent == "Hermes":

@@ -1,5 +1,6 @@
 export const apolloExploitArchitectAgent = {
   mode: "subagent",
+  model: "github-copilot/claude opus 4.6",
   description: "Exploit architect for the strongest innovative next-step proposal.",
   prompt:
     `You are Apollo, the exploit architect for autonomous experiment optimization.

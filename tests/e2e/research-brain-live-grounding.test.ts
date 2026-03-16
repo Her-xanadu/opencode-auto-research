@@ -44,7 +44,17 @@ async function makeWorkspace(): Promise<{ workspace: string; configPath: string;
     `#!/usr/bin/env python3
 import json, sys
 args = sys.argv[1:]
+prompt = args[-1] if args else ""
 agent = args[args.index("--agent") + 1] if "--agent" in args else None
+if agent is None:
+    if "@Apollo" in prompt:
+        agent = "Apollo"
+    elif "@Athena" in prompt:
+        agent = "Athena"
+    elif "@Hermes" in prompt:
+        agent = "Hermes"
+    elif "@sisyphus-junior" in prompt:
+        agent = "sisyphus-junior"
 if agent == "Apollo":
     print(json.dumps({"choice":"objective","title":"grounded-objective","family":"objective.loss","innovation_tags":["objective"],"mechanism":"grounded exploit","files_to_touch":["src/config.json"],"expected_gain":0.02,"risk":"low","why_not_parameter_only":"changes objective family","minimal_ablation":["revert objective"],"paper_grounding":[{"paper_id":"doi:10.1145/3718958.3750493","why_relevant":"exploit","mechanism_transfer":"online update"},{"paper_id":"doi:10.1145/3711896.3736964","why_relevant":"ood","mechanism_transfer":"ood gating"}]}))
 elif agent == "Hermes":
