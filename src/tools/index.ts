@@ -200,7 +200,7 @@ export const experiment_acceptance_review: ToolDefinition = tool({
 });
 
 export const experiment_run_analysis: ToolDefinition = tool({
-  description: "Run legacy tri-model placeholder analysis for the current result packet and persist compatibility proposal cards.",
+  description: "Internal/test-only legacy tri-model placeholder analysis for the current result packet.",
   args: {
     workspace_root: tool.schema.string().optional(),
   },
@@ -436,7 +436,6 @@ export function createExperimentTools(runtime?: PluginInput): Record<string, Too
     experiment_decide_iteration,
     experiment_status,
     experiment_acceptance_review,
-    experiment_run_analysis,
     experiment_controller_apply_mutation,
     experiment_controller_bootstrap,
     experiment_controller_start,

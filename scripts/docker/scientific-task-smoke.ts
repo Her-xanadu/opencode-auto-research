@@ -6,17 +6,20 @@ import {
   experiment_init,
   experiment_plan_or_resume,
   experiment_prepare_sandbox,
-  experiment_run_analysis,
   experiment_run_governed_workflow,
   experiment_status,
   experiment_validate_spec,
 } from "../../src/tools";
-import { pathExists, readJsonl } from "../../src/utils/fs";
+import { aggregateProposals } from "../../src/analysis/aggregator";
+import { resultPacketSchema } from "../../src/analysis/result-packet";
+import { runTriModelAnalysis } from "../../src/analysis/tri-model";
+import { pathExists, readJson, readJsonl } from "../../src/utils/fs";
 import {
   getCompatGoalPath,
   getBestPath,
   getOrchestrationSummaryPath,
   getOrchestrationTracePath,
+  getResultPacketPath,
   getProposalCardsPath,
   getRunsPath,
   getSessionPath,
@@ -92,7 +95,8 @@ async function main() {
   );
   const planned = JSON.parse(await experiment_plan_or_resume.execute({ workspace_root: workspaceRoot }));
   const workflow = JSON.parse(await experiment_run_governed_workflow.execute({ workspace_root: workspaceRoot }));
-  const analysis = JSON.parse(await experiment_run_analysis.execute({ workspace_root: workspaceRoot }));
+  const packet = resultPacketSchema.parse(await readJson(getResultPacketPath(workspaceRoot), null));
+  const analysis = aggregateProposals(runTriModelAnalysis(packet));
   const status = JSON.parse(await experiment_status.execute({ workspace_root: workspaceRoot }));
   const acceptance = JSON.parse(await experiment_acceptance_review.execute({ workspace_root: workspaceRoot }));
 

@@ -2,9 +2,12 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { experiment_execute_iteration, experiment_init, experiment_run_analysis, experiment_run_governed_workflow, experiment_status } from "../../src/tools";
-import { readJsonl } from "../../src/utils/fs";
-import { getOrchestrationTracePath, getRecoveryCheckpointPath } from "../../src/utils/paths";
+import { aggregateProposals } from "../../src/analysis/aggregator";
+import { resultPacketSchema } from "../../src/analysis/result-packet";
+import { runTriModelAnalysis } from "../../src/analysis/tri-model";
+import { experiment_execute_iteration, experiment_init, experiment_run_governed_workflow, experiment_status } from "../../src/tools";
+import { readJson, readJsonl } from "../../src/utils/fs";
+import { getOrchestrationTracePath, getRecoveryCheckpointPath, getResultPacketPath } from "../../src/utils/paths";
 
 const tempDirs: string[] = [];
 
@@ -49,7 +52,8 @@ describe("local e2e", () => {
         params: { key: "learning_rate", value: 0.9 },
       },
     });
-    const analysis = JSON.parse(await experiment_run_analysis.execute({ workspace_root: workspace }));
+    const packet = resultPacketSchema.parse(await readJson(getResultPacketPath(workspace), null));
+    const analysis = aggregateProposals(runTriModelAnalysis(packet));
     await fs.mkdir(path.dirname(getRecoveryCheckpointPath(workspace)), { recursive: true });
     await fs.writeFile(
       getRecoveryCheckpointPath(workspace),

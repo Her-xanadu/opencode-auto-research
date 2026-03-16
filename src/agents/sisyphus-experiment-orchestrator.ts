@@ -53,7 +53,6 @@ Output contract:
     experiment_decide_iteration: true,
     experiment_status: true,
     experiment_acceptance_review: true,
-    experiment_run_analysis: true,
     experiment_controller_bootstrap: true,
     experiment_controller_start: true,
     experiment_controller_tick: true,
