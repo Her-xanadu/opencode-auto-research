@@ -1,0 +1,22 @@
+paper_id: paper:infocom:2022:traffic-ad
+title_zh: Traffic-AD
+title_en: Traffic Anomaly Detection
+year: 2022
+venue: INFOCOM
+task_tags:
+  - anomaly
+  - validation
+method_tags:
+  - adaptation
+  - architecture
+family_tags:
+  - adaptation
+  - architecture
+evidence_quality: high
+transferability: high
+repo_fit_guess: high
+compute_cost: medium
+code_available: false
+code_url: ""
+negative_lessons:
+  - 注意阈值漂移

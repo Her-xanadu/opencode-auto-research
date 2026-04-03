@@ -1,4 +1,4 @@
-vault_root: /Users/herxanadu/Desktop/加密流量
+vault_root: ../fixtures/kb/vault
 index_output_dir: experiments/research/index
 retrieval_cache_dir: experiments/research/retrieval-cache
 evidence_output_dir: experiments/research

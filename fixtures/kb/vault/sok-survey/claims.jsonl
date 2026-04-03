@@ -1,0 +1,4 @@
+{"paper_id": "paper:sec:2023:sok-survey", "claim_id": "paper:sec:2023:sok-survey:mechanism:1", "claim_type": "mechanism", "section": "文献分类", "text": "对各类方法做聚类分析，整理失败模式与可复现性风险"}
+{"paper_id": "paper:sec:2023:sok-survey", "claim_id": "paper:sec:2023:sok-survey:limitation:2", "claim_type": "limitation", "section": "文献分类", "text": "对各类方法做聚类分析，整理失败模式与可复现性风险"}
+{"paper_id": "paper:sec:2023:sok-survey", "claim_id": "paper:sec:2023:sok-survey:negative_lesson:3", "claim_type": "negative_lesson", "section": "主要发现", "text": "论文发现了许多研究中存在的捷径学习问题与归因陷阱"}
+{"paper_id": "paper:sec:2023:sok-survey", "claim_id": "paper:sec:2023:sok-survey:transfer_hint:4", "claim_type": "transfer_hint", "section": "SoK概述", "text": "这篇论文对相关工作做了系统综述，并总结常见研究偏差"}

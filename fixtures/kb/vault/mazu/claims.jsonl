@@ -1,0 +1,4 @@
+{"paper_id": "paper:ccs:2023:mazu", "claim_id": "paper:ccs:2023:mazu:mechanism:1", "claim_type": "mechanism", "section": "核心方法", "text": "Mazu针对在线适配问题，采用了一个新的策略框架"}
+{"paper_id": "paper:ccs:2023:mazu", "claim_id": "paper:ccs:2023:mazu:limitation:2", "claim_type": "limitation", "section": "局限性分析", "text": "系统在高漂移场景下可能面临性能下降"}
+{"paper_id": "paper:ccs:2023:mazu", "claim_id": "paper:ccs:2023:mazu:negative_lesson:3", "claim_type": "negative_lesson", "section": "核心方法", "text": "Mazu针对在线适配问题，采用了一个新的策略框架"}
+{"paper_id": "paper:ccs:2023:mazu", "claim_id": "paper:ccs:2023:mazu:transfer_hint:4", "claim_type": "transfer_hint", "section": "核心方法", "text": "Mazu针对在线适配问题，采用了一个新的策略框架"}

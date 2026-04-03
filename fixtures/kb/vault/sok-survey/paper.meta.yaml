@@ -1,0 +1,22 @@
+paper_id: paper:sec:2023:sok-survey
+title_zh: SoK综述
+title_en: Systematization of Knowledge Survey
+year: 2023
+venue: SEC
+task_tags:
+  - Survey
+  - Security
+method_tags:
+  - synthesis
+  - taxonomy
+family_tags:
+  - cautionary
+  - survey
+evidence_quality: medium
+transferability: medium
+repo_fit_guess: medium
+compute_cost: low
+code_available: false
+code_url: ""
+negative_lessons:
+  - 注意数据捷径
