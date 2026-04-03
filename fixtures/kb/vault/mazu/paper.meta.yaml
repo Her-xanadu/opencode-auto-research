@@ -1,0 +1,22 @@
+paper_id: paper:ccs:2023:mazu
+title_zh: mazu
+title_en: Mazu
+year: 2023
+venue: CCS
+task_tags:
+  - Adaptation
+  - Network
+method_tags:
+  - online
+  - policy
+family_tags:
+  - adaptation
+  - objective
+evidence_quality: medium
+transferability: medium
+repo_fit_guess: medium
+compute_cost: medium
+code_available: false
+code_url: ""
+negative_lessons:
+  - 漂移场景需要谨慎

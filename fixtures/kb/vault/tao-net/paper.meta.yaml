@@ -1,0 +1,22 @@
+paper_id: paper:ndss:2023:tao-net
+title_zh: tao-net
+title_en: TAO-Net
+year: 2023
+venue: NDSS
+task_tags:
+  - Architecture
+  - Traffic
+method_tags:
+  - attention
+  - residual
+family_tags:
+  - architecture
+  - representation
+evidence_quality: medium
+transferability: medium
+repo_fit_guess: medium
+compute_cost: medium
+code_available: false
+code_url: ""
+negative_lessons:
+  - 需要防止过拟合

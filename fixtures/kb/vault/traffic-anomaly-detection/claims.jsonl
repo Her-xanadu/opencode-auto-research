@@ -1,0 +1,4 @@
+{"paper_id": "paper:infocom:2022:traffic-ad", "claim_id": "paper:infocom:2022:traffic-ad:mechanism:1", "claim_type": "mechanism", "section": "迁移性分析", "text": "可把 adaptation 机制作用到目标函数，通过加权方法强化检测边界与 validation 稳定性"}
+{"paper_id": "paper:infocom:2022:traffic-ad", "claim_id": "paper:infocom:2022:traffic-ad:limitation:2", "claim_type": "limitation", "section": "局限性", "text": "在极端稀有类别场景中，模型容易出现阈值漂移"}
+{"paper_id": "paper:infocom:2022:traffic-ad", "claim_id": "paper:infocom:2022:traffic-ad:transfer_hint:3", "claim_type": "transfer_hint", "section": "实现细节", "text": "系统采用端到端适配流程，对 experiment changes 保持可追踪归因"}
+{"paper_id": "paper:infocom:2022:traffic-ad", "claim_id": "paper:infocom:2022:traffic-ad:negative_lesson:fallback", "claim_type": "negative_lesson", "section": "自动补全", "text": "若方法依赖外部服务、重型模型或环境假设，迁移时需要先降级实现。"}

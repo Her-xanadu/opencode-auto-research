@@ -1,0 +1,4 @@
+{"paper_id": "paper:ndss:2023:tao-net", "claim_id": "paper:ndss:2023:tao-net:mechanism:1", "claim_type": "mechanism", "section": "核心方案和架构", "text": "TAO-Net提出了一个新的架构设计，通过引入自注意力机制来处理加密流量"}
+{"paper_id": "paper:ndss:2023:tao-net", "claim_id": "paper:ndss:2023:tao-net:transfer_hint:2", "claim_type": "transfer_hint", "section": "可迁移性思考", "text": "这个方法可把重塑作用到表征层，通过深度残差连接强化特征表达"}
+{"paper_id": "paper:ndss:2023:tao-net", "claim_id": "paper:ndss:2023:tao-net:limitation:fallback", "claim_type": "limitation", "section": "自动补全", "text": "需要结合原文进一步确认局限性与失败边界。"}
+{"paper_id": "paper:ndss:2023:tao-net", "claim_id": "paper:ndss:2023:tao-net:negative_lesson:fallback", "claim_type": "negative_lesson", "section": "自动补全", "text": "若方法依赖外部服务、重型模型或环境假设，迁移时需要先降级实现。"}
